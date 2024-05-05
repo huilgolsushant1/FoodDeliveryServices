@@ -1,4 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+/* Import Leaflet CSS */
+@import '../node_modules/leaflet/dist/leaflet.css';
+
+/* Import Leaflet Routing Machine CSS */
+@import '../node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css';
+
 
 .bg-purple {
     background-color: #240a96;
