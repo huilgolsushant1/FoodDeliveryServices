@@ -80,8 +80,4 @@ export class FoodDetailsComponent implements OnInit {
     this.collapsedSections[section] = !this.collapsedSections[section];
   }
 
-  formatDate(date: string): string {
-    // Implement your date formatting logic here
-    return date;
-  }
 }

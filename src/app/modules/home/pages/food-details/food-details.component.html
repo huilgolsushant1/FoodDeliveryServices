@@ -1,7 +1,6 @@
 <div class="restaurant-card">
     <div class="restaurant-details">
       <h2>{{ restaurant.restaurantDetails.properties.name }}</h2>
-      <p>{{ restaurant.restaurantDetails.properties.description }}</p>
       <div>
           Average cost for two : {{getAvgCostForTwo}}
       </div>
@@ -31,7 +30,6 @@
           <div class="review-card" *ngFor="let review of influencersReviews">
             <div class="review-header">
               <h4>{{ review.customerdetails.properties.name }}</h4>
-              <span class="review-date">{{ formatDate(review.date) }}</span>
             </div>
             <div class="review-content">
               <p>Rating: {{ review.reviews[0].rating }}</p>
@@ -55,7 +53,6 @@
           <div class="review-card" *ngFor="let review of nonInfluencersReviews">
             <div class="review-header">
               <h4>{{ review.customerdetails.properties.name }}</h4>
-              <span class="review-date">{{ formatDate(review.date) }}</span>
             </div>
             <div class="review-content">
               <p>Rating: {{ review.reviews[0].rating }}</p>
