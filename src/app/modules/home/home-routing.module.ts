@@ -12,7 +12,7 @@ const routes: Routes = [
     component:DefaultLayoutComponent,
     children:[
       {
-        path:'details/:id',
+        path:'details',
         component:FoodDetailsComponent
       },
       {
