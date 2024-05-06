@@ -1,52 +1,28 @@
 <html>
-  <body class="body">
+  <div class="content">
     <div class="card">
       <div class="title">
-        <img src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png" alt="Avatar" />
-        <div class="container">
-          <h4><b>Top 5 restaurants</b></h4>
-        </div>
-
+        <img src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png" alt="Avatar">
+        <h4>Top 5 restaurants</h4>
       </div>
-      <div class="content">
-        soemthing
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">
-        <img src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png" alt="Avatar" />
-        <div class="container">
-          <h4><b>Top Influencer Picks</b></h4>
-        </div>
-
-      </div>
-      <div class="content">
-        soemthing
-      </div>
-    </div>
-    <div class="card">
-      <div class="title">
-        <img src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png" alt="Avatar" />
-        <div class="container">
-          <h4><b>Top 5 budget-friendly restaurants </b></h4>
-        </div>
-
-      </div>
-      <div class="content">
-        soemthing
+      <div class="contentInnerCard">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Influencer Visits</th>
+              <th>Average Rating</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let restaurant of top5Influencer" (click)="onRowClick(restaurant)" style="cursor: pointer;" class="hover-effect">
+              <td>{{ restaurant.name }}</td>
+              <td>{{ restaurant.influencerVisits.low }}</td>
+              <td>{{ restaurant.avgRating }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class="card">
-      <div class="title">
-        <img src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png" alt="Avatar" />
-        <div class="container">
-          <h4><b>Top restaurants within 5km</b></h4>
-        </div>
-
-      </div>
-      <div class="content">
-        soemthing
-      </div>
-    </div>
-  </body>
+  </div>
 </html>
