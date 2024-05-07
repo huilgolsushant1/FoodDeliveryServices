@@ -1,1 +1,25 @@
+<!-- <div class="autocomplete">
+    <input type="text" (keyup)="onInput($event)" >
+    <div class="autocomplete-items" *ngIf="showDropdown">
+      <div *ngFor="let item of filteredItems" (click)="selectItem(item)">{{ item }}</div>
+    </div>
+  </div> -->
+
+  <!-- HTML -->
+<div class="autocomplete">
+  <input type="text" (keyup)="onInput($event)" placeholder="Enter Delivery Address" [value]="selected">
+  <button class="clear-button" *ngIf="selected" (click)="clearSelection()">Clear</button>
+  <div class="autocomplete-items" *ngIf="showDropdown">
+    <div *ngFor="let item of filteredItems" (click)="selectItem(item)">{{ item }}</div>
+    <div *ngIf="filteredItems.length === 0">No results found.</div>
+  </div>
+</div>
+  
+    
+    <!-- <div class="autocomplete" style="width: 300px">
+      <input id="source" type="text" name="source" placeholder="From" />
+
+      <input id="dest" type="text" name="dest" placeholder="To" />
+    </div> -->
+    <input id="routeButton" type="submit" value="Route" (click)="calculateRouteAndPrice()"  />
 <div id="map" style="height: 100vh; width:100vh "></div>

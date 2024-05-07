@@ -7,6 +7,6 @@ const router = express.Router();
 // router.route("/update").put(updateCategory);
 // router.route("/delete").delete(deleteCategory);
 
-router.get("/shortest", calculateShortestPath);
+router.post("/shortest", calculateShortestPath);
 
 module.exports=router;

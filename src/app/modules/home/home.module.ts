@@ -14,7 +14,7 @@ import { NgToastModule } from 'ng-angular-popup';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { NumberToWordsPipe } from '../share/pipes/number-to-words.pipe';
 import { ImageUploadService } from '../share/service/image-upload.service';
-import { AutoIdService } from '../share/service/auto-id.service';
+import { RidersService } from '../share/service/riders.service';
 import { WebSocketService } from '../share/service/web-socket.service';
 import { RouterModule } from '@angular/router';
 import { RestaurantBannersComponent } from './pages/restaurant-banners/restaurant-banners.component';
@@ -44,7 +44,7 @@ import { RestaurantComponent } from './pages/restaurant/restaurant.component';
   ],
   providers: [
     ImageUploadService,
-    AutoIdService,
+    RidersService,
     WebSocketService
   ],
 })

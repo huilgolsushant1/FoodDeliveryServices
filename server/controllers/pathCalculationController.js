@@ -9,7 +9,8 @@ const calculateShortestPath = async (req, res) => {
   try {
     const sourceAddress = req.body.sourceAddress;
     const destAddress = req.body.destAddress;
-
+    console.log(sourceAddress)
+    console.log(destAddress)
     var session = driver.session({
       database: "neo4j",
       defaultAccessMode: neo4j.session.READ,
@@ -17,11 +18,11 @@ const calculateShortestPath = async (req, res) => {
 
     const routeQuery = `
     MATCH (to:Address{full_address: $destAddress})-[:NEAREST_INTERSECTION]->(source:Intersection) 
-    MATCH (from:Address{full_address: $sourceAddress})-[:NEAREST_INTERSECTION]->(target:Intersection) 
+    MATCH (from:Restaurant{name: $sourceAddress})-[:NEAREST_INTERSECTION]->(target:Intersection) 
     CALL gds.shortestPath.yens.stream('sanMateo',{sourceNode: source, targetNode: target, k: 3, relationshipWeightProperty: 'length'})
     YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path
     RETURN index, totalCost,
-    [nodeId IN nodeIds | [gds.util.asNode(nodeId).location.x, gds.util.asNode(nodeId).location.y]] AS path
+    [nodeId IN nodeIds | [   gds.util.asNode(nodeId).location.latitude, gds.util.asNode(nodeId).location.longitude]] AS path
     ORDER BY index`;
 
     let shortestPaths = []; 
