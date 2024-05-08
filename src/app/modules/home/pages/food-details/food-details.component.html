@@ -1,66 +1,82 @@
+<div class="autocomplete">
+  <input type="text" (keyup)="onInput($event)" placeholder="Enter Delivery Address" [value]="selected">
+  <button class="clear-button" *ngIf="selected" (click)="clearSelection()">Clear</button>
+  <div class="autocomplete-items" *ngIf="showDropdown">
+    <div *ngFor="let item of filteredItems" (click)="selectItem(item)">{{ item }}</div>
+    <div *ngIf="filteredItems.length === 0">No results found.</div>
+  </div>
+</div>
+
 <div class="restaurant-card">
-    <div class="restaurant-details">
-      <h2>{{ restaurant.restaurantDetails.properties.name }}</h2>
-      <div class = "approx-cost">
-          Approx. Cost For Two : {{getAvgCostForTwo}}
+  <div class="restaurant-details">
+    <h2>{{ restaurant.restaurantDetails.properties.name }}</h2>
+    <div class = "approx-cost">
+        Approx. Cost For Two : {{getAvgCostForTwo}}
+        Total Price: {{totalPrice}}
+    </div>
+    <div class="cuisine-tags">
+      <span class="cuisine-tag" *ngFor="let cuisineTag of cuisine">{{
+        cuisineTag
+      }}</span> 
+      <button style="float: right;" [disabled]="selected == ''" (click)="viewCart()">View Cart</button>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <h3 (click)="toggleCollapse('dishes')">Dishes</h3>
+    <div class="content" [ngClass]="{ collapsed: collapsedSections.dishes }">
+      <div class="dish-card" *ngFor="let dish1 of dishes">
+        <h4>{{ dish1.dish }}</h4>
+        <p>Price: {{dish1.price}}</p>
+        <div>
+        <button (click)="decrementQuantity(dish1)">-</button>
+        <input type="text" [(ngModel)]="dish1.quantity" readonly>
+        <button (click)="incrementQuantity(dish1)">+</button>
       </div>
-      <div class="cuisine-tags">
-        <span class="cuisine-tag" *ngFor="let cuisineTag of cuisine">{{
-          cuisineTag
-        }}</span>
       </div>
     </div>
-  
-    <div class="collapsible">
-      <h3 (click)="toggleCollapse('dishes')">Dishes</h3>
-      <div class="content" [ngClass]="{ collapsed: collapsedSections.dishes }">
-        <div class="dish-card" *ngFor="let dish1 of dish">
-          <h4>{{ dish1 }}</h4>
-        </div>
-      </div>
-    </div>
-  
-    <div class="collapsible">
-      <h3 (click)="toggleCollapse('influencersReviews')">Influencers Reviews</h3>
-      <div
-        class="content"
-        [ngClass]="{ collapsed: collapsedSections.influencersReviews }"
-      >
-        <div class="review-group">
-          <div class="review-card" *ngFor="let review of influencersReviews">
-            <div class="review-header">
-              <h4>{{ review.customerdetails.properties.name }}</h4>
-            </div>
-            <div class="review-content">
-              <p>Rating: {{ review.reviews[0].rating }}</p>
-              <p>{{ review.reviews[0].review }}</p>
-            </div>
+  </div>
+
+  <div class="collapsible">
+    <h3 (click)="toggleCollapse('influencersReviews')">Influencers Reviews</h3>
+    <div
+      class="content"
+      [ngClass]="{ collapsed: collapsedSections.influencersReviews }"
+    >
+      <div class="review-group">
+        <div class="review-card" *ngFor="let review of influencersReviews">
+          <div class="review-header">
+            <h4>{{ review.customerdetails.properties.name }}</h4>
           </div>
-        </div>
-      </div>
-    </div>
-  
-    <div class="collapsible">
-     
-      <h3 (click)="toggleCollapse('nonInfluencersReviews')">
-        Customer Reviews
-      </h3>
-      <div
-        class="content"
-        [ngClass]="{ collapsed: collapsedSections.nonInfluencersReviews }"
-      >
-        <div class="review-group">
-          <div class="review-card" *ngFor="let review of nonInfluencersReviews">
-            <div class="review-header">
-              <h4>{{ review.customerdetails.properties.name }}</h4>
-            </div>
-            <div class="review-content">
-              <p>Rating: {{ review.reviews[0].rating }}</p>
-              <p>{{ review.reviews[0].review }}</p>
-            </div>
+          <div class="review-content">
+            <p>Rating: {{ review.reviews[0].rating }}</p>
+            <p>{{ review.reviews[0].review }}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
+
+  <div class="collapsible">
+   
+    <h3 (click)="toggleCollapse('nonInfluencersReviews')">
+      Customer Reviews
+    </h3>
+    <div
+      class="content"
+      [ngClass]="{ collapsed: collapsedSections.nonInfluencersReviews }"
+    >
+      <div class="review-group">
+        <div class="review-card" *ngFor="let review of nonInfluencersReviews">
+          <div class="review-header">
+            <h4>{{ review.customerdetails.properties.name }}</h4>
+          </div>
+          <div class="review-content">
+            <p>Rating: {{ review.reviews[0].rating }}</p>
+            <p>{{ review.reviews[0].review }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
