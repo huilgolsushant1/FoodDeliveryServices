@@ -1,1 +1,40 @@
-<p>restaurant works!</p>
+<div class="container">
+  <p class="title">LIST OF RESTAURANTS</p>
+  <div
+    *ngFor="let customer of customerList; let i = index"
+    class="card-container"
+  >
+    <div>
+      <mat-accordion>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header class="expansion-header">
+            <mat-panel-title class="restaurantName">
+              {{ customer.restaurantName }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div *ngFor="let items of customer.cartArray; let j = index">
+            <div class="nxt-card">
+              <p class="name">{{ items.customerName }}</p>
+              <p class="info">Order Number: {{ items.orderNumber }}</p>
+              <p class="info">Ordered Items: {{ items.orderedItems }}</p>
+              <button
+                class="btn"
+                (click)="onPreparingFoodClicked(i, j)"
+                [disabled]="buttonStates[i][j]"
+                [class.green]="!buttonStates[i][j]"
+                [class.blue]="buttonStates[i][j]"
+              >
+                {{ buttonStates[i][j] ? "Ready for pickup" : "Preparing food" }}
+              </button>
+            </div>
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel
+          (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false"
+        >
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div>
+</div>
