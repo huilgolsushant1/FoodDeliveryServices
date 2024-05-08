@@ -6,6 +6,7 @@ import { FoodsCartComponent } from './pages/foods-cart/foods-cart.component';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { RestaurantComponent } from './pages/restaurant/restaurant.component';
 import { RestaurantBannersComponent } from './pages/restaurant-banners/restaurant-banners.component';
+import { CustomersComponent } from './pages/customers/customers.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,10 @@ const routes: Routes = [
       {
         path:'',
         component:RestaurantBannersComponent
+      },
+      {
+        path:'customers',
+        component:CustomersComponent
       },
       {
         path:'details',

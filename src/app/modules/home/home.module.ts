@@ -20,6 +20,7 @@ import { RouterModule } from "@angular/router";
 import { RestaurantBannersComponent } from "./pages/restaurant-banners/restaurant-banners.component";
 import { RestaurantComponent } from "./pages/restaurant/restaurant.component";
 import { MatExpansionModule } from "@angular/material/expansion";
+import { CustomersComponent } from './pages/customers/customers.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { MatExpansionModule } from "@angular/material/expansion";
     NumberToWordsPipe,
     RestaurantBannersComponent,
     RestaurantComponent,
+    CustomersComponent,
   ],
   imports: [
     CommonModule,
