@@ -1,0 +1,69 @@
+.card-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+.nxt-card {
+  margin: 10px;
+  padding: 40px;
+  border: 1px solid #171717;
+  border-radius: 25px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+.btn {
+  border: 1px solid #171717;
+  font-size: 14px;
+  padding: 14px;
+  border-radius: 8px;
+  background-color: #fff;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 30px;
+}
+
+.restaurantName {
+  font-size: large;
+  color: white;
+}
+
+.mat-expansion-panel-header.expansion-header {
+  background-color: cornflowerblue !important;
+}
+
+.mat-expansion-panel-header.expansion-header:hover {
+  background-color: cornflowerblue !important;
+}
+
+.green {
+  background-color: green;
+  color: white;
+}
+
+.blue {
+  background-color: blue;
+  color: white;
+}
+
+.name {
+  font-size: 20px;
+}
+
+.info {
+  font-size: 16px;
+}

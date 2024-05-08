@@ -110,10 +110,9 @@ async function selectModeOfTransport(
     } else if (
       (weatherCondition === "rainy" || weatherCondition === "sunny") &&
       distance < 3 &&
-      (orderQuantity === 2 || orderQuantity === 3)
+      orderQuantity <= 2
     ) {
       modeOfTransport = "bicycle";
-      console.log(modeOfTransport);
     } else if (orderQuantity <= 3 && distance >= 5) {
       modeOfTransport = getFastestTransportMode(routesData);
       if (modeOfTransport === "motorcycle") {
