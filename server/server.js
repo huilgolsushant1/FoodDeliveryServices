@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const topRatedRouter = require('./routers/topRated.js');
 const getWeatherRouter = require("./routers/getWeather.js");
 const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
-
+const { mongoClient } = require('./database.js');
 const app = express();
 const port = process.env.PORT;
 
@@ -86,29 +86,12 @@ app.get('/api/banners/getTop5', async (req, res) => {
 app.get('/api/banners/getAdditionalDetails/:id', async (req, res) => {
     try {
         const restaurantId = req.params.id;
-        const session = dbConnections.neo4jClient.session(); // Create a new session
-        const result = await session.readTransaction(async tx => { // Begin a read transaction
-            const query = `
-                MATCH (restaurant:Restaurant{id: $restaurantId})-[:SERVES]->(dish:Dish)-[:BELONGSTO]->(cuisine:Cuisine)
-                OPTIONAL MATCH (restaurant)-[reviewRel:REVIEWED]->(customer:Customer)
-                WHERE reviewRel IS NOT NULL AND customer IS NOT NULL
-                WITH restaurant, cuisine, dish, COLLECT({review: reviewRel, customer: customer}) AS reviews
-                RETURN {
-                    restaurantdetails: {
-                        cuisine: COLLECT(DISTINCT cuisine.name),
-                        dish: COLLECT(DISTINCT dish.name)
-                    }
-                } AS result
-            `;
-            const queryResult = await tx.run(query, { restaurantId: parseInt(restaurantId) });
-            return queryResult.records.map(record => {
-              const { cuisine, dish } = record.get('result').restaurantdetails; // Extract cuisine and dish arrays
-           
-              return { cuisine, dish };
-          });
-        });
-        session.close(); // Close the session
-        res.json(result);
+        const db = mongoClient.db("FoodDeliveryService");
+        const collection = db.collection("restaurants");
+        const restaurants = await collection.find({
+            id: restaurantId
+        }).toArray();
+        res.json(restaurants);
     } catch (error) {
         console.error('Error fetching data from Neo4j:', error);
         res.status(500).json({ error: 'Internal server error' });
