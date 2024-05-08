@@ -1,8 +1,8 @@
 <div class="restaurant-card">
     <div class="restaurant-details">
       <h2>{{ restaurant.restaurantDetails.properties.name }}</h2>
-      <div>
-          Average cost for two : {{getAvgCostForTwo}}
+      <div class = "approx-cost">
+          Approx. Cost For Two : {{getAvgCostForTwo}}
       </div>
       <div class="cuisine-tags">
         <span class="cuisine-tag" *ngFor="let cuisineTag of cuisine">{{
@@ -43,7 +43,7 @@
     <div class="collapsible">
      
       <h3 (click)="toggleCollapse('nonInfluencersReviews')">
-        Non-Influencers Reviews
+        Customer Reviews
       </h3>
       <div
         class="content"

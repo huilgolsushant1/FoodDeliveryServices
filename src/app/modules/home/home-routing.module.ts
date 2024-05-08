@@ -5,12 +5,17 @@ import { FoodDetailsComponent } from './pages/food-details/food-details.componen
 import { FoodsCartComponent } from './pages/foods-cart/foods-cart.component';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { RestaurantComponent } from './pages/restaurant/restaurant.component';
+import { RestaurantBannersComponent } from './pages/restaurant-banners/restaurant-banners.component';
 
 const routes: Routes = [
   {
     path:'',
     component:DefaultLayoutComponent,
     children:[
+      {
+        path:'',
+        component:RestaurantBannersComponent
+      },
       {
         path:'details',
         component:FoodDetailsComponent
