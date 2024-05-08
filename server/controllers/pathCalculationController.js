@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { neo4jClient } = require('../database.js')
-const neo4j = require('neo4j-neo4jClient');
+const neo4j = require('neo4j-driver');
 const { getTotalRouteTimeforMultipleRoutes } =require('./modeOfTransportController.js')
 
 

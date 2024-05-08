@@ -4,6 +4,9 @@ const dbConnections = require('./database.js');
 const pathCalculationRoutes = require("./routers/pathCalculationRouter.js");
 const getRestaurantsRouter = require("./routers/getRestaurants.js");
 const bodyParser = require("body-parser");
+const topRatedRouter = require('./routers/topRated.js');
+const getWeatherRouter = require("./routers/getWeather.js");
+const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
 
 const app = express();
 const port = process.env.PORT;
@@ -49,8 +52,8 @@ app.get("/api/addresses",  async (req, res)=>{
 
 app.get('/api/banners/getTop5', async (req, res) => {
     try {
-        const session = dbConnections.neo4jClient.session(); // Create a new session
-        const result = await session.readTransaction(async tx => { // Begin a read transaction
+        const session = dbConnections.neo4jClient.session(); 
+        const result = await session.readTransaction(async tx => { 
             const query = `
                 MATCH (r:Restaurant)<-[rev:REVIEWED]-(c:Customer)
                 WHERE toInteger(c.totalFollowers) > 200
@@ -115,8 +118,8 @@ app.get('/api/banners/getAdditionalDetails/:id', async (req, res) => {
 app.get('/api/banners/getReviews/:id', async (req, res) => {
     try {
         const restaurantId = req.params.id;
-        const session = dbConnections.neo4jClient.session(); // Create a new session
-        const result = await session.readTransaction(async tx => { // Begin a read transaction
+        const session = dbConnections.neo4jClient.session();
+        const result = await session.readTransaction(async tx => {
             const query = `
                 MATCH (c:Customer)-[r:REVIEWED]->(res:Restaurant {id: $restaurantId})
                 WITH c, COLLECT({review: r.review, rating: r.rating}) AS reviews
@@ -135,7 +138,7 @@ app.get('/api/banners/getReviews/:id', async (req, res) => {
                 return { customerdetails, reviews, isInfluencer };
             });
         });
-        session.close(); // Close the session
+        session.close(); 
         res.json(result);
     } catch (error) {
         console.error('Error fetching data from Neo4j:', error);
@@ -157,8 +160,8 @@ app.get('/api/banners/getAvgCostForTwo/:id', async (req, res) => {
       const queryResult = await tx.run(query, { restaurantId: parseInt(restaurantId) });
       return queryResult.records.map(record => record.get('avgCostForTwo'));
     });
-    session.close(); // Close the session
-    res.json(result[0]); // Return the first result
+    session.close(); 
+    res.json(result[0]); 
   } catch (error) {
     console.error('Error fetching data from Neo4j:', error);
     res.status(500).json({ error: 'Internal server error' });
