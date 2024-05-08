@@ -13,7 +13,7 @@ const app = express();
 const port = process.env.PORT;
 
 dbConnections.connectMongoDB();
-
+const neo4jClient=dbConnections.neo4jClient;
 // Middleware
 app.use(express.json());
 app.use(cors());
@@ -23,14 +23,44 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Router
 app.use("/api/path", pathCalculationRoutes);
 app.use("/api/getRestaurants", getRestaurantsRouter);
+<<<<<<< HEAD
 app.use("/api/topRated", topRatedRouter);
 app.use("/api/getCustomers", getCustomerRouter);
 app.use("/api/getWeather", getWeatherRouter);
 app.use("/api/getdynamicprice", getDynamicPriceRouter);
+=======
+app.get("/api/addresses",  async (req, res)=>{
+    try{
+        const session = dbConnections.neo4jClient.session(); 
+        const searchString=req.query.searchString;
+        console.log(searchString)
+        const result = await session.readTransaction(async tx => { // Begin a read transaction
+            const query = `
+                 CALL 
+            db.index.fulltext.queryNodes("search_index", $searchString) 
+            YIELD node, score
+            RETURN  coalesce(node.name, node.full_address) as fullAddress
+            ORDER BY score DESC LIMIT 25
+            `;
+            const queryResult = await tx.run(query,{searchString:searchString});
+            return queryResult.records.map(record => {
+                return record.get('fullAddress');
+            });
+        });
+        session.close(); // Close the session
+        res.json(result);
+    }
+    catch(error)
+    {
+        console.error('Error fetching data from Neo4j:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+>>>>>>> 3f196daf56155e6b4c7988b950d9cf71bbc27b89
 
 app.get('/api/banners/getTop5', async (req, res) => {
     try {
-        const session = dbConnections.driver.session(); 
+        const session = dbConnections.neo4jClient.session(); 
         const result = await session.readTransaction(async tx => { 
             const query = `
                 MATCH (r:Restaurant)<-[rev:REVIEWED]-(c:Customer)
@@ -64,7 +94,7 @@ app.get('/api/banners/getTop5', async (req, res) => {
 app.get('/api/banners/getAdditionalDetails/:id', async (req, res) => {
     try {
         const restaurantId = req.params.id;
-        const session = dbConnections.driver.session(); // Create a new session
+        const session = dbConnections.neo4jClient.session(); // Create a new session
         const result = await session.readTransaction(async tx => { // Begin a read transaction
             const query = `
                 MATCH (restaurant:Restaurant{id: $restaurantId})-[:SERVES]->(dish:Dish)-[:BELONGSTO]->(cuisine:Cuisine)
@@ -96,7 +126,7 @@ app.get('/api/banners/getAdditionalDetails/:id', async (req, res) => {
 app.get('/api/banners/getReviews/:id', async (req, res) => {
     try {
         const restaurantId = req.params.id;
-        const session = dbConnections.driver.session();
+        const session = dbConnections.neo4jClient.session();
         const result = await session.readTransaction(async tx => {
             const query = `
                 MATCH (c:Customer)-[r:REVIEWED]->(res:Restaurant {id: $restaurantId})
@@ -127,8 +157,8 @@ app.get('/api/banners/getReviews/:id', async (req, res) => {
 app.get('/api/banners/getAvgCostForTwo/:id', async (req, res) => {
   try {
     const restaurantId = req.params.id;
-    const session = dbConnections.driver.session(); 
-    const result = await session.readTransaction(async tx => { 
+    const session = dbConnections.neo4jClient.session(); // Create a new session
+    const result = await session.readTransaction(async tx => { // Begin a read transaction
       const query = `
         MATCH (r:Restaurant {id: $restaurantId})<-[rev:REVIEWED]-()
         WHERE rev.costForTwo IS NOT NULL

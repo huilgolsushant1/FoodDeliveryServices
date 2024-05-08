@@ -1,0 +1,72 @@
+/* CSS (adjust as needed) */
+.autocomplete {
+    position: relative;
+  }
+  
+  input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .clear-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .autocomplete-items {
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1;
+  }
+  
+  .autocomplete-items div {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .autocomplete-items div:hover {
+    background-color: #e0e0e0;
+  }
+  
+
+  /* rider.component.css */
+
+.rider-container {
+    display: flex;
+    /* background-color: rgb(255, 193, 7); */
+    padding: 20px;
+}
+
+.map-container {
+    flex: 1;
+    height: 100vh; /* Set the desired height for the map */
+    width:100vh;
+}
+
+.order-details {
+    flex: 1;
+    margin-left: 20px;
+    /* color: white; */
+}
+
+button {
+    color: white;
+    background-color: rgb(255, 193, 7);
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer !important;
+}
+
+/* button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+} */

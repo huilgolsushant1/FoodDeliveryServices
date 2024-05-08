@@ -36,14 +36,14 @@ function getFastestTransportMode(routesData) {
   let fastestMode = null;
   let shortestTravelTime = Infinity;
   routesData.forEach((route) => {
-    const travelTime = route.routes[0]["summary"].travelTimeInSeconds;
+    const travelTime = route?.routes[0]["summary"].travelTimeInSeconds;
     if (travelTime < shortestTravelTime) {
       shortestTravelTime = travelTime;
       fastestMode = route;
     }
   });
 
-  return fastestMode.routes[0]["sections"][0].travelMode;
+  return fastestMode?.routes[0]["sections"][0].travelMode;
 }
 
 //Function to get the Traffic Density
@@ -150,25 +150,23 @@ function sliceAtSpecificCount(array) {
 
 //This function will return the fastest routes coordinates
 async function getTotalRouteTimeforMultipleRoutes(
-  apiKey,
-  para,
+  pathArrays,
   modeOfTransport
 ) {
-  for (let i = 0; i < para.data.length; i++) {
-    let coordinates = sliceAtSpecificCount(para.data[i].path);
+  for (let i = 0; i < pathArrays.length; i++) {
+    let coordinates = sliceAtSpecificCount(pathArrays[i].path);
     let fastestMode = null;
     let shortestTravelTime = Infinity;
     try {
       let totalTravelTime = 0;
 
       for (let j = 0; j < coordinates.length - 1; j++) {
-        const sourceCoords = `${coordinates[j][1]},${coordinates[j][0]}`;
-        const destinationCoords = `${coordinates[j + 1][1]},${
-          coordinates[j + 1][0]
+        const sourceCoords = `${coordinates[j][0]},${coordinates[j][1]}`;
+        const destinationCoords = `${coordinates[j + 1][0]},${
+          coordinates[j + 1][1]
         }`;
-
         const routeUrl = `https://api.tomtom.com/routing/1/calculateRoute/${sourceCoords}:${destinationCoords}/json?key=${apiKey}&traffic=true&computeTravelTimeFor=all&routeType=fastest&language=en&instructionsType=tagged&travelMode=${modeOfTransport}`;
-
+        console.log(routeUrl)
         const routeResponse = await fetch(routeUrl);
         const trafficData = await routeResponse.json();
 
@@ -182,19 +180,24 @@ async function getTotalRouteTimeforMultipleRoutes(
           totalTravelTime += actualTravelTime;
         }
       }
-      para.data[i].totalTravelTime = totalTravelTime;
+      pathArrays[i].totalTravelTime = totalTravelTime;
     } catch (error) {
       console.error("Error fetching data:", error);
       return null;
     }
-
-    para.data.forEach((route) => {
+    let shortestPath;
+    pathArrays.forEach((route) => {
+      console.log(route.totalTravelTime)
       const travelTime = route.totalTravelTime;
       if (travelTime < shortestTravelTime) {
-        shortestTravelTime = travelTime;
-        fastestMode = route;
+        shortestPath=route;
       }
     });
-    return fastestMode;
+    console.log("hi")
+    console.log(shortestPath)
+    return shortestPath;
   }
 }
+
+
+module.exports = { getTotalRouteTimeforMultipleRoutes, selectModeOfTransport };

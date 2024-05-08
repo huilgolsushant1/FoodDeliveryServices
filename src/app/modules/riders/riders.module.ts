@@ -6,11 +6,13 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { OrdersComponent } from './pages/orders/orders.component';
+import { TextTransformPipe } from '../share/pipes/text-transform.pipe';
 
 
 @NgModule({
   declarations: [
-    OrdersComponent
+    OrdersComponent,
+    TextTransformPipe
   ],
   imports: [
     CommonModule,
