@@ -1,0 +1,22 @@
+<!-- customer-list.component.html -->
+<h2>Customer List</h2>
+
+<table>
+  <thead>
+    <tr>
+        <th>Id</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let customer of customers">
+        <td>{{ customer.id }}</td>
+      <td>{{ customer.name }}</td>
+      <td>{{ customer.email }}</td>
+      <td><button (click)="selectCustomer(customer)">Select</button></td>
+    </tr>
+  </tbody>
+</table>
+
