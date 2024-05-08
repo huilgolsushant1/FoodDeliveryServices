@@ -5,6 +5,8 @@ const pathCalculationRoutes = require("./routers/pathCalculationRouter.js");
 const getRestaurantsRouter = require("./routers/getRestaurants.js");
 const bodyParser = require("body-parser");
 const topRatedRouter = require('./routers/topRated.js');
+const getWeatherRouter = require("./routers/getWeather.js");
+const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
 
 const app = express();
 const port = process.env.PORT;
@@ -22,6 +24,8 @@ app.use("/api/path", pathCalculationRoutes);
 app.use("/api/getRestaurants", getRestaurantsRouter);
 app.use("/api/topRated", topRatedRouter);
 
+app.use("/api/getWeather", getWeatherRouter);
+app.use("/api/getdynamicprice", getDynamicPriceRouter);
 
 app.get('/api/banners/getTop5', async (req, res) => {
     try {
