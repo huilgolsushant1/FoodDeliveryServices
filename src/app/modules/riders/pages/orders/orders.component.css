@@ -37,3 +37,36 @@
     background-color: #e0e0e0;
   }
   
+
+  /* rider.component.css */
+
+.rider-container {
+    display: flex;
+    /* background-color: rgb(255, 193, 7); */
+    padding: 20px;
+}
+
+.map-container {
+    flex: 1;
+    height: 100vh; /* Set the desired height for the map */
+    width:100vh;
+}
+
+.order-details {
+    flex: 1;
+    margin-left: 20px;
+    /* color: white; */
+}
+
+button {
+    color: white;
+    background-color: rgb(255, 193, 7);
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer !important;
+}
+
+/* button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+} */

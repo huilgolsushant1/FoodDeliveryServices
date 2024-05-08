@@ -11,7 +11,7 @@ import { HttpClientModule } from '@angular/common/http'; // Import HttpClientMod
   declarations: [
     AppComponent,
     FooterComponent
-  ],
+    ],
   imports: [
     BrowserModule,
     AppRoutingModule,

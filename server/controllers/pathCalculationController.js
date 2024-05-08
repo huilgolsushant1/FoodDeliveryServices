@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { driver } = require('../database.js')
-const neo4j = require('neo4j-driver');
-
+const { neo4jClient } = require('../database.js')
+const neo4j = require('neo4j-neo4jClient');
+const { getTotalRouteTimeforMultipleRoutes } =require('./modeOfTransportController.js')
 
 
 const calculateShortestPath = async (req, res) => {
@@ -11,7 +11,7 @@ const calculateShortestPath = async (req, res) => {
     const destAddress = req.body.destAddress;
     console.log(sourceAddress)
     console.log(destAddress)
-    var session = driver.session({
+    var session = neo4jClient.session({
       database: "neo4j",
       defaultAccessMode: neo4j.session.READ,
     });
@@ -26,18 +26,22 @@ const calculateShortestPath = async (req, res) => {
     ORDER BY index`;
 
     let shortestPaths = []; 
+    let oneShortestPath;
 
     session
       .run(routeQuery, { sourceAddress, destAddress })
       .subscribe({
         onNext: records => {
           shortestPaths.push({"distance":records.get("totalCost"),"path":records.get("path")}); 
+
         },
-        onCompleted: () => {
+        onCompleted: async () => {
           session.close();
+          oneShortestPath=await getTotalRouteTimeforMultipleRoutes(shortestPaths, "motorcycle")
+          console.log(oneShortestPath)
           res.status(201).json({
             success: true,
-            data: shortestPaths,
+            data: oneShortestPath,
             message: "Shortest Paths Calculated"
           });
         },

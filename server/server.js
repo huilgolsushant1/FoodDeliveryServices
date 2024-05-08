@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT;
 
 dbConnections.connectMongoDB();
-
+const neo4jClient=dbConnections.neo4jClient;
 // Middleware
 app.use(express.json());
 app.use(cors());
@@ -21,7 +21,7 @@ app.use("/api/path", pathCalculationRoutes);
 app.use("/api/getRestaurants", getRestaurantsRouter);
 app.get("/api/addresses",  async (req, res)=>{
     try{
-        const session = dbConnections.driver.session(); 
+        const session = dbConnections.neo4jClient.session(); 
         const searchString=req.query.searchString;
         console.log(searchString)
         const result = await session.readTransaction(async tx => { // Begin a read transaction
@@ -49,7 +49,7 @@ app.get("/api/addresses",  async (req, res)=>{
 
 app.get('/api/banners/getTop5', async (req, res) => {
     try {
-        const session = dbConnections.driver.session(); // Create a new session
+        const session = dbConnections.neo4jClient.session(); // Create a new session
         const result = await session.readTransaction(async tx => { // Begin a read transaction
             const query = `
                 MATCH (r:Restaurant)<-[rev:REVIEWED]-(c:Customer)
@@ -83,7 +83,7 @@ app.get('/api/banners/getTop5', async (req, res) => {
 app.get('/api/banners/getAdditionalDetails/:id', async (req, res) => {
     try {
         const restaurantId = req.params.id;
-        const session = dbConnections.driver.session(); // Create a new session
+        const session = dbConnections.neo4jClient.session(); // Create a new session
         const result = await session.readTransaction(async tx => { // Begin a read transaction
             const query = `
                 MATCH (restaurant:Restaurant{id: $restaurantId})-[:SERVES]->(dish:Dish)-[:BELONGSTO]->(cuisine:Cuisine)
@@ -115,7 +115,7 @@ app.get('/api/banners/getAdditionalDetails/:id', async (req, res) => {
 app.get('/api/banners/getReviews/:id', async (req, res) => {
     try {
         const restaurantId = req.params.id;
-        const session = dbConnections.driver.session(); // Create a new session
+        const session = dbConnections.neo4jClient.session(); // Create a new session
         const result = await session.readTransaction(async tx => { // Begin a read transaction
             const query = `
                 MATCH (c:Customer)-[r:REVIEWED]->(res:Restaurant {id: $restaurantId})
@@ -146,7 +146,7 @@ app.get('/api/banners/getReviews/:id', async (req, res) => {
 app.get('/api/banners/getAvgCostForTwo/:id', async (req, res) => {
   try {
     const restaurantId = req.params.id;
-    const session = dbConnections.driver.session(); // Create a new session
+    const session = dbConnections.neo4jClient.session(); // Create a new session
     const result = await session.readTransaction(async tx => { // Begin a read transaction
       const query = `
         MATCH (r:Restaurant {id: $restaurantId})<-[rev:REVIEWED]-()

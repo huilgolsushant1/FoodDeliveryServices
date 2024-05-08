@@ -21,8 +21,27 @@ export class OrdersComponent implements OnInit {
 
 
   constructor(private ridersService: RidersService,
-  ) { }
+  ) {
+    this.orderDetails={
+      "restaurantName":"Paakashala",
+      "restaurantAddress":"201 S DELAWARE AVE # B, SAN MATEO, 94401",
+      "orderId":"#1234",
+      "orderItems":[{
+        "dish":"Waffles",
+        "price":"123",
+        "quantity":2
+      },
+      {
+        "dish":"Waffles",
+        "price":"123",
+        "quantity":2
+      }],
+      "orderStatus":"readyForPickup"
+    }
+   }
 
+  orderDetails:any;
+  statusToBeUpdated:string="";
   map: any;
 
   items: string[] = [];
@@ -49,7 +68,16 @@ export class OrdersComponent implements OnInit {
     //   waypoints: [L.latLng(57.74, 11.94), L.latLng(57.6792, 11.949)],
     //   routeWhileDragging: true
     // }).addTo(this.map);
-
+    if(this.orderDetails?.orderStatus==="readyForPickup")
+      {
+        console.log("this.orderDetails?.orderStatus")
+        this.statusToBeUpdated="Out For Delivery"
+      }
+      else if(this.orderDetails?.orderStatus==="Out For Delivery")
+      {
+        this.statusToBeUpdated="Delivered"
+      }
+      
   }
   onInput(event: any) {
 
@@ -83,7 +111,7 @@ export class OrdersComponent implements OnInit {
     if (this.selected && this.restaurant) {
       this.ridersService.getRoute(this.restaurant, this.selected).subscribe((result: any) => {
         console.log(result);
-        if (result?.success && result?.data?.length > 0) {
+        if (result?.success && result?.data && result?.data) {
           this.restaurantToDest = result?.data[0].path;
           // L.Routing.control({
           //   waypoints: this.restaurantToDest,
@@ -113,5 +141,10 @@ export class OrdersComponent implements OnInit {
     }
   }
 
+
+  updateStatus()
+  {
+
+  }
 
 }
