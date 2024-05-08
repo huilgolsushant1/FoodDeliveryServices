@@ -1,14 +1,9 @@
-const express = require('express');
-const router = express.Router();
 const axios = require('axios');
 
-router.get('/weather', async (req, res) => {
+async function getWeather(location) {
   try {
-    // Extract location from query parameters
-    const location = "heidelberg";
-    
     if (!location) {
-      return res.status(400).json({ error: 'Location parameter is missing' });
+      throw new Error('Location parameter is missing');
     }
 
     // Fetch weather data using weatherapi.com API
@@ -31,11 +26,11 @@ router.get('/weather', async (req, res) => {
       weatherCategory = 'sunny';
     }
 
-    res.json({ weatherCategory });
+    return { weatherCategory };
   } catch (error) {
     console.error("Error fetching weather data:", error);
-    res.status(500).json({ error: 'Server Error' });
+    throw new Error('Server Error');
   }
-});
+}
 
-module.exports = router;
+module.exports = getWeather;
