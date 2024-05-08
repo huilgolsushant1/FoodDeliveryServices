@@ -23,12 +23,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Router
 app.use("/api/path", pathCalculationRoutes);
 app.use("/api/getRestaurants", getRestaurantsRouter);
-<<<<<<< HEAD
 app.use("/api/topRated", topRatedRouter);
 app.use("/api/getCustomers", getCustomerRouter);
 app.use("/api/getWeather", getWeatherRouter);
 app.use("/api/getdynamicprice", getDynamicPriceRouter);
-=======
 app.get("/api/addresses",  async (req, res)=>{
     try{
         const session = dbConnections.neo4jClient.session(); 
@@ -56,7 +54,6 @@ app.get("/api/addresses",  async (req, res)=>{
         res.status(500).json({ error: 'Internal server error' });
     }
 });
->>>>>>> 3f196daf56155e6b4c7988b950d9cf71bbc27b89
 
 app.get('/api/banners/getTop5', async (req, res) => {
     try {

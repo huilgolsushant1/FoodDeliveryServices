@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { client } = require("../database.js");
+const { mongoClient } = require("../database.js");
 
 router.get("/customers", async (req, res) => {
     try {
-      const db = client.db("FoodDeliveryService");
+      const db = mongoClient.db("FoodDeliveryService");
       const customersCollection = db.collection("customers");
   
       const topCustomers = await customersCollection.find({}).limit(5).toArray();
