@@ -1,13 +1,16 @@
-const express = require('express');
-const cors = require('cors');
-const dbConnections = require('./database.js');
+const express = require("express");
+const cors = require("cors");
+const dbConnections = require("./database.js");
 const pathCalculationRoutes = require("./routers/pathCalculationRouter.js");
 const getRestaurantsRouter = require("./routers/getRestaurants.js");
 const bodyParser = require("body-parser");
-const topRatedRouter = require('./routers/topRated.js');
+const topRatedRouter = require("./routers/topRated.js");
 const getWeatherRouter = require("./routers/getWeather.js");
 const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
 const orderRouter = require("./routers/orderRouter.js");
+const allocateRider = require("./routers/riderAllocationRouter.js");
+const { mongoClient } = require('./database.js');
+const getCustomerRouter = require("./routers/getCustomers.js")
 
 const app = express();
 const port = process.env.PORT;
@@ -25,6 +28,9 @@ app.use("/api/path", pathCalculationRoutes);
 app.use("/api/getRestaurants", getRestaurantsRouter);
 app.use("/api/order", orderRouter );
 
+app.use("/api/topRated", topRatedRouter);
+app.use("/api/getCustomers", getCustomerRouter);
+app.use("/api/path", allocateRider);
 app.get("/api/addresses",  async (req, res)=>{
     try{
         const session = dbConnections.neo4jClient.session(); 
@@ -72,26 +78,28 @@ app.get('/api/banners/getTop5', async (req, res) => {
                 ORDER BY influencerVisits DESC
                 LIMIT 5
             `;
-            const queryResult = await tx.run(query);
-            return queryResult.records.map(record => {
-                const { restaurantDetails, name, influencerVisits, avgRating } = record.get('result');
-                return { restaurantDetails, name, influencerVisits, avgRating };
-            });
-        });
-        session.close(); // Close the session
-        res.json(result);
-    } catch (error) {
-        console.error('Error fetching data from Neo4j:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+      const queryResult = await tx.run(query);
+      return queryResult.records.map((record) => {
+        const { restaurantDetails, name, influencerVisits, avgRating } =
+          record.get("result");
+        return { restaurantDetails, name, influencerVisits, avgRating };
+      });
+    });
+    session.close(); // Close the session
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching data from Neo4j:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-app.get('/api/banners/getAdditionalDetails/:id', async (req, res) => {
-    try {
-        const restaurantId = req.params.id;
-        const session = dbConnections.neo4jClient.session(); // Create a new session
-        const result = await session.readTransaction(async tx => { // Begin a read transaction
-            const query = `
+app.get("/api/banners/getAdditionalDetails/:id", async (req, res) => {
+  try {
+    const restaurantId = req.params.id;
+    const session = dbConnections.neo4jClient.session(); // Create a new session
+    const result = await session.readTransaction(async (tx) => {
+      // Begin a read transaction
+      const query = `
                 MATCH (restaurant:Restaurant{id: $restaurantId})-[:SERVES]->(dish:Dish)-[:BELONGSTO]->(cuisine:Cuisine)
                 OPTIONAL MATCH (restaurant)-[reviewRel:REVIEWED]->(customer:Customer)
                 WHERE reviewRel IS NOT NULL AND customer IS NOT NULL
@@ -103,27 +111,29 @@ app.get('/api/banners/getAdditionalDetails/:id', async (req, res) => {
                     }
                 } AS result
             `;
-            const queryResult = await tx.run(query, { restaurantId: parseInt(restaurantId) });
-            return queryResult.records.map(record => {
-              const { cuisine, dish } = record.get('result').restaurantdetails; // Extract cuisine and dish arrays
-           
-              return { cuisine, dish };
-          });
-        });
-        session.close(); // Close the session
-        res.json(result);
-    } catch (error) {
-        console.error('Error fetching data from Neo4j:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+      const queryResult = await tx.run(query, {
+        restaurantId: parseInt(restaurantId),
+      });
+      return queryResult.records.map((record) => {
+        const { cuisine, dish } = record.get("result").restaurantdetails; // Extract cuisine and dish arrays
+
+        return { cuisine, dish };
+      });
+    });
+    session.close(); // Close the session
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching data from Neo4j:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-app.get('/api/banners/getReviews/:id', async (req, res) => {
-    try {
-        const restaurantId = req.params.id;
-        const session = dbConnections.neo4jClient.session();
-        const result = await session.readTransaction(async tx => {
-            const query = `
+app.get("/api/banners/getReviews/:id", async (req, res) => {
+  try {
+    const restaurantId = req.params.id;
+    const session = dbConnections.neo4jClient.session();
+    const result = await session.readTransaction(async (tx) => {
+      const query = `
                 MATCH (c:Customer)-[r:REVIEWED]->(res:Restaurant {id: $restaurantId})
                 WITH c, COLLECT({review: r.review, rating: r.rating}) AS reviews
                 RETURN {
@@ -135,21 +145,23 @@ app.get('/api/banners/getReviews/:id', async (req, res) => {
                     END
                 } AS result
             `;
-            const queryResult = await tx.run(query, { restaurantId: parseInt(restaurantId) });
-            return queryResult.records.map(record => {
-                const { customerdetails, reviews, isInfluencer } = record.get('result');
-                return { customerdetails, reviews, isInfluencer };
-            });
-        });
-        session.close(); 
-        res.json(result);
-    } catch (error) {
-        console.error('Error fetching data from Neo4j:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+      const queryResult = await tx.run(query, {
+        restaurantId: parseInt(restaurantId),
+      });
+      return queryResult.records.map((record) => {
+        const { customerdetails, reviews, isInfluencer } = record.get("result");
+        return { customerdetails, reviews, isInfluencer };
+      });
+    });
+    session.close();
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching data from Neo4j:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-app.get('/api/banners/getAvgCostForTwo/:id', async (req, res) => {
+app.get("/api/banners/getAvgCostForTwo/:id", async (req, res) => {
   try {
     const restaurantId = req.params.id;
     const session = dbConnections.neo4jClient.session(); // Create a new session
@@ -160,18 +172,19 @@ app.get('/api/banners/getAvgCostForTwo/:id', async (req, res) => {
         WITH avg(rev.costForTwo) AS avgCostForTwo
         RETURN {cost: toInteger(avgCostForTwo)} AS avgCostForTwo
       `;
-      const queryResult = await tx.run(query, { restaurantId: parseInt(restaurantId) });
-      return queryResult.records.map(record => record.get('avgCostForTwo'));
+      const queryResult = await tx.run(query, {
+        restaurantId: parseInt(restaurantId),
+      });
+      return queryResult.records.map((record) => record.get("avgCostForTwo"));
     });
-    session.close(); 
-    res.json(result[0]); 
+    session.close();
+    res.json(result[0]);
   } catch (error) {
-    console.error('Error fetching data from Neo4j:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching data from Neo4j:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-
 app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
+  console.log(`Server started on port ${port}`);
 });

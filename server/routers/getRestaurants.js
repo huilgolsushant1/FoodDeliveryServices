@@ -24,23 +24,29 @@ router.get("/orders", async (req, res) => {
 
     const pendingOrders = [];
     restaurants.forEach((restaurant) => {
+      let data = {
+        restaurantName: restaurant.name,
+        restaurantsId: restaurant.id,
+        orderArray: [],
+      };
       orders.forEach((order) => {
         if (
           restaurant.id == order.restaurantId &&
           order.orderStatus === "pending"
         ) {
-          let data = {
-            restaurantName: restaurant.name,
-            restaurantsId: restaurant.id,
+          let orderCart = {
             orderId: order.orderId,
             orderItems: order.orderedItems,
             customerName: order.customerName,
             totalPrice: order.totalPrice,
             orderStatus: order.orderStatus,
           };
-          pendingOrders.push(data);
+          data.orderArray.push(orderCart);
         }
       });
+      if (data.orderArray.length != 0) {
+        pendingOrders.push(data);
+      }
     });
     res.json(pendingOrders);
   } catch (error) {
