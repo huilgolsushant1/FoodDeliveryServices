@@ -1,7 +1,7 @@
 const express = require("express");
 const { distinct } = require("rxjs");
 
-const apiKey = "eqi3q2O1zlkovRfuMnjXxg3Ev0GAkD5N";
+const apiKey = "C67ws6JZAR0GlvAzBtGoK4FRo5iNQfkA";
 
 //Main Function
 async function selectModeOfTransport(data, orderItesm, isDelicate) {
@@ -143,7 +143,7 @@ function calculateTrafficDensity(trafficData) {
 
 //Function to shorten the array of coordinates
 function sliceAtSpecificCount(array) {
-  const count = Math.ceil(array.length / 10);
+  const count = Math.ceil(array.length / 5);
   let result = [];
   result.push(array[0]);
   for (let i = count - 1; i < array.length - 1; i += count) {
@@ -172,7 +172,6 @@ async function getTotalRouteTimeforMultipleRoutes(pathArrays, modeOfTransport) {
         const routeUrl = `https://api.tomtom.com/routing/1/calculateRoute/${sourceCoords}:${destinationCoords}/json?key=${apiKey}&traffic=true&computeTravelTimeFor=all&routeType=fastest&language=en&instructionsType=tagged&travelMode=${modeOfTransport}`;
         const routeResponse = await fetch(routeUrl);
         const trafficData = await routeResponse.json();
-        
         if (
           trafficData &&
           trafficData.routes &&
@@ -183,7 +182,6 @@ async function getTotalRouteTimeforMultipleRoutes(pathArrays, modeOfTransport) {
           totalTravelTime += actualTravelTime;
         }
       }
-      console.log("Travel Time:"+totalTravelTime)
       pathArrays[i].totalTravelTime = totalTravelTime;
     } catch (error) {
       console.error("Error fetching data:", error);
