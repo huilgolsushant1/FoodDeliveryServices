@@ -32,7 +32,7 @@ router.get("/orders", async (req, res) => {
       orders.forEach((order) => {
         if (
           restaurant.id == order.restaurantId &&
-          order.orderStatus === "pending"
+          order.orderStatus === "confirmed"
         ) {
           let orderCart = {
             orderId: order.orderId,
