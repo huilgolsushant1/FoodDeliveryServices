@@ -1,5 +1,5 @@
 const express = require('express');
-const { driver } = require('../database.js')
+const { neo4jClient } = require('../database.js')
 const neo4j = require('neo4j-driver');
 
 async function topBudgetRestaurantsController(req, res) {
@@ -12,15 +12,16 @@ async function topBudgetRestaurantsController(req, res) {
   MATCH (restaurant:Restaurant)<-[rev:REVIEWED]-()
   WHERE rev.costForTwo IS NOT NULL AND point.distance(customerLocation, restaurant.location) <= 10000
   WITH restaurant, avg(rev.costForTwo) AS avgCostForTwo, point.distance(customerLocation, restaurant.location) AS distanceToCustomer
-  RETURN restaurant.name,
+  RETURN restaurant.id,
+         restaurant.name,
          toInteger(avgCostForTwo) AS avgCostForTwo,
-         round(distanceToCustomer / 1000, 1) AS distanceToCustomerKms, 
-         restaurant
+         round(distanceToCustomer / 1000, 1) AS distanceToCustomerKms 
+         
   ORDER BY avgCostForTwo ASC
   LIMIT 5
   `;
 
-  const session = driver.session({
+  const session = neo4jClient.session({
     database: "neo4j",
     defaultAccessMode: neo4j.session.READ,
   });
@@ -39,7 +40,7 @@ async function topBudgetRestaurantsController(req, res) {
             "restaurant_name":records.get("restaurant.name"),
             "avgCostForTwo":records.get("avgCostForTwo"),
             "distanceToCustomerKms":records.get("distanceToCustomerKms"),
-            "restaurantDetails":records.get("restaurant")
+            "restaurant_id":records.get("restaurant.id")
           }); 
         },
         onCompleted: () => {
@@ -47,7 +48,7 @@ async function topBudgetRestaurantsController(req, res) {
           res.status(200).json({
             success: true,
             data: topBudgetRestaurants, /*data variable that needs to be sent here*/
-            message: "Top Rated Restaurants"
+            message: "Top Rated Budget Friendly Restaurants"
           });
         },
         onError: error => {
