@@ -40,7 +40,7 @@ async function topBudgetRestaurantsController(req, res) {
             "restaurant_name":records.get("restaurant.name"),
             "avgCostForTwo":records.get("avgCostForTwo"),
             "distanceToCustomerKms":records.get("distanceToCustomerKms"),
-            "restaurant_id":records.get("restaurant.id")
+            "restaurantId":records.get("restaurant.id")
           }); 
         },
         onCompleted: () => {
@@ -48,7 +48,7 @@ async function topBudgetRestaurantsController(req, res) {
           res.status(200).json({
             success: true,
             data: topBudgetRestaurants, /*data variable that needs to be sent here*/
-            message: "Top Rated Budget Friendly Restaurants"
+            message: "Top Rated Budget Friendly Restaurants nearby 10 kms"
           });
         },
         onError: error => {

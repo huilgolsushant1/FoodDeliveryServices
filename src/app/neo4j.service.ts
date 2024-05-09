@@ -16,13 +16,12 @@ export class Neo4jService {
   }
 
   getTopRestaurants(): Observable<any[]> {
+    const customerData = JSON.parse(sessionStorage.getItem('customer') || '{}');
     return this.http
       .get<any[]>(
         `${
           this.apiUrl
-        }/topRated/top-rated-restaurants?customerName=${encodeURIComponent(
-          "New Customer"
-        )}`
+        }/topRated/top-rated-restaurants?customerName=${encodeURIComponent(customerData.name)}`
       )
       .pipe(map((response) => (response as any).data));
   }
@@ -34,10 +33,9 @@ export class Neo4jService {
   }
 
   getTopBudgetFriendly(): Observable<any[]> {
+    const customerData = JSON.parse(sessionStorage.getItem('customer') || '{}');
     return this.http.get<any[]>(
-      `${this.apiUrl}/topRated/restaurants?customerName=${encodeURIComponent(
-        "New Customer"
-      )}`
+      `${this.apiUrl}/topRated/restaurants?customerName=${encodeURIComponent(customerData.name)}`
     ).pipe(map((response) => (response as any).data));
   }
 
@@ -56,13 +54,4 @@ export class Neo4jService {
       `${this.apiUrl}/banners/getAvgCostForTwo/${id}`
     );
   }
-
-  checkPrice(object: any): Observable<any[]> {
-    return this.http.post<any[]>(`http://localhost:3001/api/order/checkprice`, object);
-  }
-
-  placeOrder(object: any): Observable<any[]> {
-    return this.http.post<any[]>(`http://localhost:3001/api/order/confirm`, object.data);
-  }
-  
 }

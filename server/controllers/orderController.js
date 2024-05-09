@@ -38,6 +38,9 @@ const placeTheOrder = async (req, res) => {
          
         //update rider status 
         const riderCollection = db.collection("riders");
+
+        // If the code fails here, try to remove the `.low` from riderId as it iwll be just an integer now
+        // rather than {low: num, high: num} object
         console.log(response.orderDetails.rider.riderId.low)
         const filter = { "id": response.orderDetails.rider.riderId.low };
         console.log(JSON.stringify(filter))

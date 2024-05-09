@@ -61,9 +61,8 @@ export class FoodsCartComponent implements OnInit {
   }
 
   placeOrder() {
-    this.neo4jService.placeOrder(this.ordersData).subscribe((res: any) => {
-      if(res.success)
-        this.router.navigate(['/checkout'], { state: { res } });
-    })
+    // this.neo4jService.placeOrder(this.ordersData).subscribe(res => {
+    //   this.router.navigate(['/cart']);
+    // })
   }
 }
