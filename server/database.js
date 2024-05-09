@@ -48,20 +48,18 @@ const redisClient = createClient({
 });
 
 // Promisify client.get function
-redisClient.getAsync = promisify(redisClient.get).bind(redisClient);
-
-redisClient.connect();
-
-redisClient.on('connect', () => {
-  console.log('Connected to Redis server');
-});
-
-redisClient.on('error', (error) => {
-  console.error('Not connected -------------',error);
+const connectRedisDB= async()=>{
+  redisClient.getAsync = promisify(redisClient.get).bind(redisClient);
+await redisClient.connect().then((r)=>{
+  console.log("redis connected")
+}) .catch((err) => {
+  console.log('err connecting to redis ' + err);
 });
 
 
-module.exports = {connectMongoDB, neo4jClient, mongoClient, redisClient};
+}
+
+module.exports = {connectMongoDB, neo4jClient, mongoClient, redisClient, connectRedisDB};
 
 
 

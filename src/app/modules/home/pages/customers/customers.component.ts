@@ -28,6 +28,15 @@ export class CustomersComponent implements OnInit{
     );
   }
   selectCustomer(customer: any) {
+    
+    this.http.post('http://localhost:3001/api/cache', customer).subscribe(
+      (data) => {
+        console.log(data)
+      },
+      (error) => {
+        console.error('Error setting cache', error);
+      }
+    );
     sessionStorage.setItem('customer', JSON.stringify(customer));
     this.router.navigate(['/home']);
   }

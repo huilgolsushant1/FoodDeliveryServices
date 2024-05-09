@@ -18,7 +18,7 @@
       <td>{{ rider.name }}</td>
       <td>{{ rider.vehicleType }}</td>
       <td>{{ rider.status }}</td>
-      <td><button (click)="selectrider(rider)">Select</button></td>
+      <td><button (click)="selectRider(rider)" *ngIf="rider.status==='assigned'">Select</button></td>
     </tr>
   </tbody>
 </table>

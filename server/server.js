@@ -9,12 +9,13 @@ const getWeatherRouter = require("./routers/getWeather.js");
 const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
 const orderRouter = require("./routers/orderRouter.js");
 const riderRouter = require("./routers/riderRouter.js");
-const { mongoClient, redisClient } = require('./database.js');
+const { mongoClient, redisClient, connectRedisDB } = require('./database.js');
 const getCustomerRouter = require("./routers/getCustomers.js")
 
 const app = express();
 const port = process.env.PORT;
 
+connectRedisDB();
 dbConnections.connectMongoDB();
 const neo4jClient=dbConnections.neo4jClient;
 // Middleware
@@ -30,12 +31,10 @@ app.use("/api/order", orderRouter );
 
 app.use("/api/topRated", topRatedRouter);
 app.use("/api/getCustomers", getCustomerRouter);
-app.use("/api/path", riderRouter);
 app.get("/api/addresses",  async (req, res)=>{
     try{
         const session = dbConnections.neo4jClient.session(); 
         const searchString=req.query.searchString;
-        console.log(searchString)
         const result = await session.readTransaction(async tx => { // Begin a read transaction
             const query = `
                  CALL 
@@ -58,7 +57,24 @@ app.get("/api/addresses",  async (req, res)=>{
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-app.use("/api/rider", riderRouter);
+app.use("/api/riders", riderRouter);
+
+app.post('/api/cache', async (req, res) => {
+  try{
+          
+       const customerDetails=req.body;
+       const redisCustomerKey=(Buffer.from(customerDetails.name.toLowerCase().trim().replace(' ', '') + customerDetails.id).toString('base64'))
+       await redisClient.set(redisCustomerKey, JSON.stringify(customerDetails));
+        console.log("Customer Cache Set")
+        res.status(200).json({ message: "Customer Cache Set" })
+  }
+  catch(e)
+  {
+    console.log(e)
+    res.status(500).json({ error: "Internal server error" });
+
+  }
+})
 
 
 //Top Influencer picks api
@@ -176,9 +192,9 @@ app.use((err, req, res, next) => {
     res.sendStatus(500);
 })
 
-process.on("exit", function(){
-  redisClient.quit();
-});
+// process.on("exit", function(){
+//   redisClient.quit();
+// });
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
