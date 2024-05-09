@@ -12,8 +12,8 @@ const placeTheOrder = async (req, res) => {
         //allocate rider to order
         let response=reqObj;
         response.orderDetails.rider=await getDriverLocation(reqObj.orderDetails.restaurantName, reqObj.orderDetails.rider.modeOfTransport)
+        response.orderDetails.orderStatus = 'confirmed';
         
-
         //add it to mongo db 
         const db = mongoClient.db("FoodDeliveryService");
         const ordersCollection = db.collection("orders");

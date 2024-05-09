@@ -1,1 +1,25 @@
-.checkbox { margin: 0; }
+.rider-container {
+    display: flex;
+    /* background-color: rgb(255, 193, 7); */
+    padding: 20px;
+}
+
+.map-container {
+    height: 100%; /* Set the desired height for the map */
+    width:70%;
+}
+
+.order-details {
+    width: 30%;
+    margin-left: 20px;
+    /* color: white; */
+}
+
+button {
+    color: white;
+    background-color: rgb(255, 193, 7);
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer !important;
+}
