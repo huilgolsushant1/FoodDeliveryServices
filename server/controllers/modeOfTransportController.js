@@ -309,5 +309,5 @@ let newData = {
   modeOfTransport: "bike",
 };
 
-setOrder(code, newData);
+//setOrder(code, newData);
 module.exports = { getTotalRouteTimeforMultipleRoutes, selectModeOfTransport };

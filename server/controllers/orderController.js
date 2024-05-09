@@ -50,7 +50,7 @@ const placeTheOrder = async (req, res) => {
         const resultUpdate = await riderCollection.updateOne(filter, updatedDocument);
         console.log(resultUpdate)
 
-        if (resultInsert.insertedId && resultUpdate.modifiedCount) {
+        if (resultInsert.insertedId) {
             await redisClient.set(Buffer.from(response.orderDetails.customerName.toLowerCase().trim().replace(' ', '') + response.orderDetails.customerId).toString('base64'), JSON.stringify(response));
             res.status(200).json({
                 success: true,
