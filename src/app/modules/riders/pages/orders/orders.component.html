@@ -1,1 +1,59 @@
-<div id="map" style="height: 100vh"></div>
+<!-- <div class="autocomplete">
+    <input type="text" (keyup)="onInput($event)" >
+    <div class="autocomplete-items" *ngIf="showDropdown">
+      <div *ngFor="let item of filteredItems" (click)="selectItem(item)">{{ item }}</div>
+    </div>
+  </div> -->
+
+  <!-- HTML -->
+<div class="autocomplete">
+  <input type="text" (keyup)="onInput($event)" placeholder="Enter Delivery Address" [value]="selected">
+  <button class="clear-button" *ngIf="selected" (click)="clearSelection()">Clear</button>
+  <div class="autocomplete-items" *ngIf="showDropdown">
+    <div *ngFor="let item of filteredItems" (click)="selectItem(item)">{{ item }}</div>
+    <div *ngIf="filteredItems.length === 0">No results found.</div>
+  </div>
+</div>
+  
+    
+    <!-- <div class="autocomplete" style="width: 300px">
+      <input id="source" type="text" name="source" placeholder="From" />
+
+      <input id="dest" type="text" name="dest" placeholder="To" />
+    </div> -->
+    <input id="routeButton" type="submit" value="Route" (click)="calculateRouteAndPrice()"  />
+<!-- <div id="map" style="height: 100vh; width:100vh "></div> -->
+
+
+<!-- rider.component.html -->
+
+<!-- rider.component.html -->
+
+<div class="rider-container">
+  <div class="map-container">
+      <!-- Leaflet map goes here -->
+      <div id="map" style="height: 100vh; width:100vh "></div>
+  </div>
+  <div class="order-details">
+    <h2>Order Details {{ orderDetails.orderId}}</h2>
+    <div class="order-card">
+        <div class="card-header">
+            <h5>Restaurant Name</h5>
+            <p>{{ orderDetails.restaurantName }}</p>
+        </div>
+        <div class="card-body">
+            <h5>Restaurant Address</h5>
+                        <p>{{ orderDetails.restaurantAddress }}</p>
+
+            <h5>Order Items</h5>
+            <ul>
+              <li *ngFor="let item of orderDetails.orderItems">
+                {{ item.quantity }}x {{ item.dish }} - ${{ item.price * item.quantity }}
+            </li>            </ul>
+        </div>
+    </div>
+    <p>Order Status: {{ orderDetails.orderStatus | textTransform }}</p>
+    <button (click)="updateStatus()" *ngIf="statusToBeUpdated">{{ statusToBeUpdated }}</button>
+  </div>
+</div>
+

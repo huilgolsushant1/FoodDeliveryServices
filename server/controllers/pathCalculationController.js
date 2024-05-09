@@ -1,42 +1,47 @@
 const express = require('express');
 const router = express.Router();
-const { driver } = require('../database.js')
+const { neo4jClient } = require('../database.js')
 const neo4j = require('neo4j-driver');
-
+const { getTotalRouteTimeforMultipleRoutes } =require('./modeOfTransportController.js')
 
 
 const calculateShortestPath = async (req, res) => {
   try {
     const sourceAddress = req.body.sourceAddress;
     const destAddress = req.body.destAddress;
-
-    var session = driver.session({
+    console.log(sourceAddress)
+    console.log(destAddress)
+    var session = neo4jClient.session({
       database: "neo4j",
       defaultAccessMode: neo4j.session.READ,
     });
 
     const routeQuery = `
     MATCH (to:Address{full_address: $destAddress})-[:NEAREST_INTERSECTION]->(source:Intersection) 
-    MATCH (from:Address{full_address: $sourceAddress})-[:NEAREST_INTERSECTION]->(target:Intersection) 
+    MATCH (from:Restaurant{name: $sourceAddress})-[:NEAREST_INTERSECTION]->(target:Intersection) 
     CALL gds.shortestPath.yens.stream('sanMateo',{sourceNode: source, targetNode: target, k: 3, relationshipWeightProperty: 'length'})
     YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path
     RETURN index, totalCost,
-    [nodeId IN nodeIds | [gds.util.asNode(nodeId).location.x, gds.util.asNode(nodeId).location.y]] AS path
+    [nodeId IN nodeIds | [   gds.util.asNode(nodeId).location.latitude, gds.util.asNode(nodeId).location.longitude]] AS path
     ORDER BY index`;
 
     let shortestPaths = []; 
+    let oneShortestPath;
 
     session
       .run(routeQuery, { sourceAddress, destAddress })
       .subscribe({
         onNext: records => {
           shortestPaths.push({"distance":records.get("totalCost"),"path":records.get("path")}); 
+
         },
-        onCompleted: () => {
+        onCompleted: async () => {
           session.close();
+          oneShortestPath=await getTotalRouteTimeforMultipleRoutes(shortestPaths, "motorcycle")
+          console.log(oneShortestPath)
           res.status(201).json({
             success: true,
-            data: shortestPaths,
+            data: oneShortestPath,
             message: "Shortest Paths Calculated"
           });
         },

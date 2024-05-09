@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AutoIdService } from './auto-id.service';
+import { AutoIdService } from './riders.service';
 
-describe('AutoIdService', () => {
+describe('RidersService', () => {
   let service: AutoIdService;
 
   beforeEach(() => {

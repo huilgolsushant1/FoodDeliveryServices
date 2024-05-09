@@ -91,6 +91,24 @@
   padding: 10px;
 }
 
+.autocomplete-items {
+  position: absolute;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1;
+}
+
+.autocomplete-items div {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.autocomplete-items div:hover {
+  background-color: #e0e0e0;
+}
+
 
 /* .preview {
     display: -webkit-box;
