@@ -62,7 +62,7 @@ export class Neo4jService {
   }
 
   placeOrder(object: any): Observable<any[]> {
-    return this.http.post<any[]>(`http://localhost:3001/api/order/confirm`, object);
+    return this.http.post<any[]>(`http://localhost:3001/api/order/confirm`, object.data);
   }
   
 }

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { driver } = require('../database.js');
+const { neo4jClient } = require('../database.js');
 const neo4j = require('neo4j-driver');
 
 async function topRatedRestaurantsController(req, res) {
@@ -17,7 +17,7 @@ async function topRatedRestaurantsController(req, res) {
     LIMIT 5
   `;
 
-  const session = driver.session({
+  const session = neo4jClient.session({
     database: "neo4j",
     defaultAccessMode: neo4j.session.READ,
   });

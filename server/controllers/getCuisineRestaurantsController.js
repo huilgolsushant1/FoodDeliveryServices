@@ -1,9 +1,9 @@
 const express = require('express');
-const { driver } = require('../database.js')
+const { neo4jClient } = require('../database.js')
 const neo4j = require('neo4j-driver');
 
 async function getCuisineRestaurantsController(req, res) {
-  const session = driver.session({ database: "neo4j", defaultAccessMode: neo4j.session.READ });
+  const session = neo4jClient.session({ database: "neo4j", defaultAccessMode: neo4j.session.READ });
 
   try {
     const cuisineRestaurantsQuery = `
