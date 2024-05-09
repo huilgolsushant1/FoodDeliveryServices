@@ -21,14 +21,14 @@ export class CheckoutComponent {
   showDropdown: boolean = false;
   restaurant: string = "NUTRICION CELLULAR"
   restaurantToDest: any;
-
+  shortestPath: any;
   constructor(private ridersService: RidersService)
   {}
 
    ngOnInit() {
     const temp = history.state.res;
     this.orderDetails = temp.data.orderDetails;
-    console.log(temp.data);
+    this.shortestPath = temp.data.shortestPaths
     
     Marker.prototype.options.icon = this.defaultIcon;
 
@@ -43,15 +43,6 @@ export class CheckoutComponent {
     //   waypoints: [L.latLng(57.74, 11.94), L.latLng(57.6792, 11.949)],
     //   routeWhileDragging: true
     // }).addTo(this.map);
-    if(this.orderDetails?.orderStatus==="readyForPickup")
-      {
-        console.log("this.orderDetails?.orderStatus")
-        this.statusToBeUpdated="Out For Delivery"
-      }
-      else if(this.orderDetails?.orderStatus==="Out For Delivery")
-      {
-        this.statusToBeUpdated="Delivered"
-      }
       
   }
   onInput(event: any) {
