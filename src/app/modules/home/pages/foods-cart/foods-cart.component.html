@@ -1,15 +1,3 @@
-<div class="restaurants-drop">
-  <select [(ngModel)]="selectedRestaurant" (change)="fetchDishesByRestaurantId($event)">
-    <option *ngFor="let restaurant of restaurants" [value]="restaurant.id">{{ restaurant.name }}</option>
-  </select>
-  
-  <select *ngIf="selectedRestaurant" [(ngModel)]="selectedDish">
-    <option *ngFor="let dish of selectedRestaurantDishes" [value]="dish.dish"> {{ dish.dish }} -  ₹{{ dish.price }}</option>
-  </select>
-  <button (click)="addToCart()">Add to Cart</button>
-  <!-- Rest of your cart HTML -->
-</div>
-
 <div class="cart-container">
   <!-- Your existing content for the food order cart -->
   <h2>Food Order Cart</h2>
@@ -27,7 +15,7 @@
  
   <div class="cart-total">
     <span>Cart Total: </span>
-    <span>₹{{ cartTotal }}</span>
+    <span>{{ ordersData.totalPrice }}</span>
   </div>
   <div class="delivery-fees">
     <span>Delivery fees: </span>
@@ -35,7 +23,7 @@
   </div>
   <div class="total-amount">
     <span>Total Amount: </span>
-    <span>228</span>
+    <span>{{ ordersData.totalPrice }}</span>
   </div>
-  <button class="checkout">Checkout</button>
+  <button class="checkout" (click)="placeOrder()">Place Order</button>
 </div>

@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { client } = require("../database.js");
+const { mongoClient } = require("../database.js");
 
 router.get("/restaurants", async (req, res) => {
   try {
-    const db = client.db("FoodDeliveryService");
+    const db = mongoClient.db("FoodDeliveryService");
     const collection = db.collection("restaurants");
     const restaurants = await collection.find({}).toArray();
     res.json(restaurants);
@@ -16,7 +16,7 @@ router.get("/restaurants", async (req, res) => {
 
 router.get("/orders", async (req, res) => {
   try {
-    const db = client.db("FoodDeliveryService");
+    const db = mongoClient.db("FoodDeliveryService");
     const restaurantsCollection = db.collection("restaurants");
     const ordersCollection = db.collection("orders");
     const restaurants = await restaurantsCollection.find({}).toArray();

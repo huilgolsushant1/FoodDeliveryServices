@@ -28,5 +28,13 @@ export class Neo4jService {
   getAvgCostForTwo(id: any): Observable<any[]> {
     return this.http.get<any[]>(`${this._getAvgCostForTwo}/${id}`);
   }
+
+  checkPrice(object: any): Observable<any[]> {
+    return this.http.post<any[]>(`http://localhost:3001/api/order/checkprice`, object);
+  }
+
+  placeOrder(object: any): Observable<any[]> {
+    return this.http.post<any[]>(`http://localhost:3001/api/order/confirm`, object);
+  }
   
 }

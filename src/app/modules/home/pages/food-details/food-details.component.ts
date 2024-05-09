@@ -173,19 +173,19 @@ export class FoodDetailsComponent implements OnInit {
   }
 
   createObject() {
-    // this.orderData = {
-    //   "restaurantId": this.restaurantId,
-    //   "restaurantName": this.restaurant.name,
-    //   "totalPrice": this.totalPrice,
-    //   "orderedItems": this.getOrderItems(),
-    //   "customerName": this.customerData.name,
-    //   "customerId": this.customerData.id,
-    //   "deliveryAddress":  this.selected,
-    // }
-    this.orderSample.deliveryAddress = this.selected;
-    this.orderSample = this.orderSample;
-    sessionStorage.setItem('orderData', JSON.stringify(this.orderSample));
-    this.router.navigate(['/cart']);
+    this.orderData = {
+      "restaurantId": this.restaurantId,
+      "restaurantName": this.restaurant.name,
+      "totalPrice": this.totalPrice,
+      "orderedItems": this.getOrderItems(),
+      "customerName": this.customerData.name,
+      "customerId": this.customerData.id,
+      "deliveryAddress":  this.selected,
+    }
+    this.neo4jService.checkPrice(this.orderData).subscribe(res => {
+      sessionStorage.setItem('orderData', JSON.stringify(res));
+      this.router.navigate(['/cart']);
+    })
   }
 
 }
