@@ -12,11 +12,12 @@
               {{ customer.restaurantName }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <div *ngFor="let items of customer.cartArray; let j = index">
+          <div *ngFor="let items of customer.orderArray; let j = index">
             <div class="nxt-card">
               <p class="name">{{ items.customerName }}</p>
-              <p class="info">Order Number: {{ items.orderNumber }}</p>
-              <p class="info">Ordered Items: {{ items.orderedItems }}</p>
+              <p class="info">Order Number: {{ items.orderId }}</p>
+              <p>Ordered Items: {{ formatOrderItems(items.orderItems) }}</p>
+              <p class="info">Total Price: {{ items.totalPrice }}</p>
               <button
                 class="btn"
                 (click)="onPreparingFoodClicked(i, j)"
