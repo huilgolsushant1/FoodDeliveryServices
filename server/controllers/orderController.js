@@ -11,8 +11,10 @@ const placeTheOrder = async (req, res) => {
 
         //allocate rider to order
         let response=reqObj;
+        response.orderDetails.deliveryCode = Math.floor(1000 + Math.random() * 9000);
         response.orderDetails.rider=await getDriverLocation(reqObj.orderDetails.restaurantName, reqObj.orderDetails.rider.modeOfTransport)
         response.orderDetails.orderStatus = 'confirmed';
+        response.orderDetails.rider.pickUpCode = Math.floor(1000 + Math.random() * 9000);
         
         //add it to mongo db 
         const db = mongoClient.db("FoodDeliveryService");
