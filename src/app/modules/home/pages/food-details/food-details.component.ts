@@ -26,25 +26,6 @@ export class FoodDetailsComponent implements OnInit {
 
   customerData: any;
   orderData: any;
-
-  orderSample = {
-    "restaurantId":123,
-    "restaurantName":"Kalesh's Corner",
-    "orderedItems":[{
-        "dish":"Waffles - choco",
-        "price":"123",
-        "quantity":2
-      },
-      {
-        "dish":"Waffles - cherry",
-        "price":"123",
-        "quantity":2
-      }
-    ],
-    "totalPrice":"200",
-    "customerName":"Kalesh Patil",
-    "deliveryAddress":"Kalesh's Cross"
-}
   
   constructor(
     private neo4jService: Neo4jService,

@@ -1,1 +1,28 @@
-Write the customer tracking code here
+<div class="rider-container">
+    <div class="map-container">
+        <!-- Leaflet map goes here -->
+        <div id="map" style="height: 80vh; width:130vh "></div>
+    </div>
+    <div class="order-details">
+      <h2>Order Details {{ orderDetails.orderId}}</h2>
+      <div class="order-card">
+          <div class="card-header">
+              <h5>Restaurant Name</h5>
+              <p>{{ orderDetails.restaurantName }}</p>
+          </div>
+          <div class="card-body">
+              <h5>Rider Name</h5>
+              <p>{{ orderDetails.rider.riderName }}</p>
+              <h5>Order Items</h5>
+              <ul>
+                <li *ngFor="let item of orderDetails.orderedItems">
+                  {{ item.quantity }}x {{ item.dish }} - ${{ item.price * item.quantity }}
+              </li>            </ul>
+              <h5>Total Price</h5>
+              <p>{{ orderDetails.totalPrice }}</p>
+          </div>
+      </div>
+      <h5>Order Status: </h5><p>{{ orderDetails.orderStatus }}</p>
+
+    </div>
+  </div>
