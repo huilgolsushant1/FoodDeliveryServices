@@ -1,110 +1,13 @@
 const { calculateShortestPath } = require('./pathCalculationController.js')
 const { selectModeOfTransport } = require('./modeOfTransportController.js')
-const { redisClient, mongoClient } = require('../database.js')
+const { redisClient, mongoClient, neo4jClient } = require('../database.js')
+const neo4j = require('neo4j-driver');
 const { calculateTotalPrice } = require('../routers/getDynamicPrice.js')
 const { getDriverLocation } = require('./allocateRider.js')
 const placeTheOrder = async (req, res) => {
     try {
 
         let reqObj = req.body;
-        // {
-        //     "shortestPaths": [
-        //         {
-        //             "path": [],
-        //             "distance": 2345,
-        //             "totalTravelTime": 30
-        //         },
-        //         {
-        //             "path": [],
-        //             "distance": 2345,
-        //             "totalTravelTime": 30
-        //         },
-        //         {
-        //             "path": [],
-        //             "distance": 2345,
-        //             "totalTravelTime": 30
-        //         }
-        //     ],
-        //     "weather": "snowy",
-        //     "orderDetails": {
-        //         "orderId": "123",
-        //         "restaurantId": 123,
-        //         "restaurantName": "Kalesh's Corner",
-        //         "orderedItems": [{
-        //             "dish": "Waffles - choco",
-        //             "price": "123",
-        //             "quantity": 2
-        //         },
-        //         {
-        //             "dish": "Waffles - cherry",
-        //             "price": "123",
-        //             "quantity": 2
-        //         }
-        //         ],
-        //         "customerName": "Kalesh Patil",
-        //         "customerId":1,
-        //         "deliveryAddress": "Kalesh's Cross",
-        //         "totalPrice": 2300,
-        //         "rider": {
-        //             "riderId": 8,
-        //             "riderName": "Kalesh's Rider",
-        //             "modeOfTransport": "Car",
-        //             "deliveryCharge": "200"
-        //         },
-        //         "orderStatus": "Pending"
-        //     }
-
-        // }
-
-        // const shortestPaths = [
-        //     {
-        //         "path": [],
-        //         "distance": 2345,
-        //         "totalTravelTime": 30
-        //     },
-        //     {
-        //         "path": [],
-        //         "distance": 2345,
-        //         "totalTravelTime": 30
-        //     },
-        //     {
-        //         "path": [],
-        //         "distance": 2345,
-        //         "totalTravelTime": 30
-        //     }
-        // ];
-        // const weather = "snowy";
-        // const orderDetails = {
-        //     "orderId": "123",
-        //     "restaurantId": 123,
-        //     "restaurantName": "Kalesh's Corner",
-        //     "orderedItems": [{
-        //         "dish": "Waffles - choco",
-        //         "price": "123",
-        //         "quantity": 2
-        //     },
-        //     {
-        //         "dish": "Waffles - cherry",
-        //         "price": "123",
-        //         "quantity": 2
-        //     }
-        //     ],
-        //     "customerId":1,
-        //     "customerName": "Kalesh Patil",
-        //     "deliveryAddress": "Kalesh's Cross",
-        //     "totalPrice": 2300,
-        //     "rider": {
-        //         "riderId": 6,
-        //         "riderName": "Kalesh's Rider",
-        //         "modeOfTransport": "Car",
-        //         "deliveryCharge": "200"
-        //     },
-        //     "orderStatus": "Pending"
-        // };
-
-        // //store this in redis key
-        // let encoded=Buffer.from("Hello World").toString('base64');
-        // console.log(Buffer.from(encoded, 'base64').toString('ascii'));
 
         //allocate rider to order
         let response=reqObj;
@@ -117,6 +20,21 @@ const placeTheOrder = async (req, res) => {
 
         const resultInsert = await ordersCollection.insertOne(reqObj.orderDetails);
         console.log(resultInsert)
+
+        //update neo4j status
+        var session = neo4jClient.session({
+            database: "neo4j",
+            defaultAccessMode: neo4j.session.WRITE,
+          });
+
+          const routeQuery = `
+          MATCH (r:Rider {id: $riderId})
+          SET r.status = 'assigned'
+          RETURN r
+          `;
+          const riderId = response.orderDetails.rider.riderId.low;
+          const result = await session.run(routeQuery, { riderId });
+          console.log('Rider Updated Status', riderId);
          
         //update rider status 
         const riderCollection = db.collection("riders");
@@ -175,7 +93,7 @@ const checkPrice = async (req, res) => {
         let customerDetails=JSON.parse(await redisClient.get(Buffer.from(reqObj.customerName.toLowerCase().trim().replace(' ', '') + reqObj.customerId).toString('base64')));
         let response= {
             "shortestPaths": shortestPaths,
-            "weather": customerDetails.weather,
+            "weather": "sunny",
             "orderDetails":reqObj
         }
         res.status(200).json({
