@@ -1,17 +1,89 @@
 const express = require("express");
+const { distinct } = require("rxjs");
 
 const apiKey = "eqi3q2O1zlkovRfuMnjXxg3Ev0GAkD5N";
-const sourceCoords = "18.968555507998804,72.83261687709988";
-const destinationCoords = "18.962280011567497,72.83195284427188";
 
-// TC 1
-const weatherCondition = "rainy";
-const distance = 10;
-const orderQuantity = 2;
-const isDelicate = false;
+//Main Function
+async function selectModeOfTransport(data, orderItesm, isDelicate) {
+  try {
+    let orderQuantity = orderItesm.length;
+    let distance = data.distance / 1000;
+    let modeOfTransport = "bike";
+    let hasDelayInOrder = flase;
+    let pathLenth = data.path.length;
+    let sourceCoords = `${data.path[0][0]},${data.path[0][1]}`;
+    let destinationCoords = `${data.path[pathLenth - 1][0]},${
+      data.path[pathLenth - 1][1]
+    }`;
 
-//Calling of main function
-selectModeOfTransport(weatherCondition, distance, orderQuantity, isDelicate);
+    let weatherCondition = getWeatherData(destinationCoords);
+    let car = await getRouteData(
+      apiKey,
+      sourceCoords,
+      destinationCoords,
+      "car"
+    );
+
+    let bike = await getRouteData(
+      apiKey,
+      sourceCoords,
+      destinationCoords,
+      "motorcycle"
+    );
+
+    let bicycle = await getRouteData(
+      apiKey,
+      sourceCoords,
+      destinationCoords,
+      "bicycle"
+    );
+
+    let routesData = [car, bike];
+
+    if (!hasDelayInOrder) {
+      if (
+        (distance >= 6 && orderQuantity > 3 && checkRidersAvailibilty("car")) ||
+        isDelicate
+      ) {
+        modeOfTransport = "car";
+      } else if (
+        (weatherCondition === "rainy" || weatherCondition === "sunny") &&
+        distance >= 4 &&
+        distance <= 6 &&
+        orderQuantity <= 3 &&
+        checkRidersAvailibilty("bike")
+      ) {
+        modeOfTransport = "bike";
+      } else if (
+        (weatherCondition === "rainy" || weatherCondition === "sunny") &&
+        distance < 3 &&
+        orderQuantity <= 2
+      ) {
+        modeOfTransport = "bicycle";
+      } else if (orderQuantity <= 3 && distance >= 5) {
+        modeOfTransport = getFastestTransportMode(routesData);
+        if (modeOfTransport === "motorcycle") {
+          modeOfTransport = "bike";
+        }
+      } else {
+        modeOfTransport = "car";
+      }
+    } else {
+      if (distance >= 3 && !isDelicate) {
+        modeOfTransport = getFastestTransportMode(routesData);
+        if (modeOfTransport === "motorcycle") {
+          modeOfTransport = "bike";
+        }
+      } else {
+        modeOfTransport = "car";
+      }
+    }
+
+    return modeOfTransport;
+  } catch (error) {
+    console.log("Error to determine the mode of transport: ", error);
+  }
+}
 
 //Function to get the Routes Data from Tom-Tom's Route API
 async function getRouteData(
@@ -69,73 +141,6 @@ function calculateTrafficDensity(trafficData) {
   }
 }
 
-//Main Function
-async function selectModeOfTransport(
-  weatherCondition,
-  distance,
-  orderQuantity,
-  isDelicate
-) {
-  let modeOfTransport = "bike";
-  let hasDelayInOrder = true;
-
-  let car = await getRouteData(apiKey, sourceCoords, destinationCoords, "car");
-
-  let bike = await getRouteData(
-    apiKey,
-    sourceCoords,
-    destinationCoords,
-    "motorcycle"
-  );
-
-  let bicycle = await getRouteData(
-    apiKey,
-    sourceCoords,
-    destinationCoords,
-    "bicycle"
-  );
-
-  let routesData = [car, bike];
-
-  if (!hasDelayInOrder) {
-    if ((distance >= 6 && orderQuantity > 3) || isDelicate) {
-      modeOfTransport = "car";
-    } else if (
-      (weatherCondition === "rainy" || weatherCondition === "sunny") &&
-      distance >= 4 &&
-      distance <= 6 &&
-      orderQuantity <= 3
-    ) {
-      modeOfTransport = "bike";
-    } else if (
-      (weatherCondition === "rainy" || weatherCondition === "sunny") &&
-      distance < 3 &&
-      orderQuantity <= 2
-    ) {
-      modeOfTransport = "bicycle";
-    } else if (orderQuantity <= 3 && distance >= 5) {
-      modeOfTransport = getFastestTransportMode(routesData);
-      if (modeOfTransport === "motorcycle") {
-        modeOfTransport = "bike";
-      }
-    } else {
-      modeOfTransport = "car";
-    }
-  } else {
-    if (distance >= 3 && !isDelicate) {
-      modeOfTransport = getFastestTransportMode(routesData);
-      if (modeOfTransport === "motorcycle") {
-        modeOfTransport = "bike";
-      }
-    } else {
-      modeOfTransport = "car";
-    }
-  }
-
-  console.log(modeOfTransport);
-  return modeOfTransport;
-}
-
 //Function to shorten the array of coordinates
 function sliceAtSpecificCount(array) {
   const count = Math.ceil(array.length / 10);
@@ -149,10 +154,7 @@ function sliceAtSpecificCount(array) {
 }
 
 //This function will return the fastest routes coordinates
-async function getTotalRouteTimeforMultipleRoutes(
-  pathArrays,
-  modeOfTransport
-) {
+async function getTotalRouteTimeforMultipleRoutes(pathArrays, modeOfTransport) {
   for (let i = 0; i < pathArrays.length; i++) {
     let coordinates = sliceAtSpecificCount(pathArrays[i].path);
     let fastestMode = null;
@@ -166,7 +168,7 @@ async function getTotalRouteTimeforMultipleRoutes(
           coordinates[j + 1][1]
         }`;
         const routeUrl = `https://api.tomtom.com/routing/1/calculateRoute/${sourceCoords}:${destinationCoords}/json?key=${apiKey}&traffic=true&computeTravelTimeFor=all&routeType=fastest&language=en&instructionsType=tagged&travelMode=${modeOfTransport}`;
-        console.log(routeUrl)
+        console.log(routeUrl);
         const routeResponse = await fetch(routeUrl);
         const trafficData = await routeResponse.json();
 
@@ -187,17 +189,63 @@ async function getTotalRouteTimeforMultipleRoutes(
     }
     let shortestPath;
     pathArrays.forEach((route) => {
-      console.log(route.totalTravelTime)
+      console.log(route.totalTravelTime);
       const travelTime = route.totalTravelTime;
       if (travelTime < shortestTravelTime) {
-        shortestPath=route;
+        shortestPath = route;
       }
     });
-    console.log("hi")
-    console.log(shortestPath)
+    console.log("hi");
+    console.log(shortestPath);
     return shortestPath;
   }
 }
 
+//Function to check the availibilty of rider for selected mode of transport
+async function checkRidersAvailibilty(modeOfTransport) {
+  try {
+    const db = client.db("FoodDeliveryService");
+    const collection = db.collection("riders");
+    const riders = await collection
+      .find({ vehicleType: modeOfTransport, status: "available" })
+      .toArray();
+    if (riders.length != 0) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Error checking for riders availibilty: ", error);
+  }
+}
+
+//Function to get the weather data
+async function getWeatherData(location) {
+  try {
+    const apiKey = "f5b7ac4a88014420b2e163532240705";
+    const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}`;
+
+    const response = await axios.get(apiUrl);
+    const weatherData = response.data;
+
+    const conditionText = weatherData.current.condition.text.toLowerCase();
+    let weatherCategory;
+
+    if (conditionText.includes("rain") || conditionText.includes("drizzle")) {
+      weatherCategory = "rainy";
+    } else if (
+      conditionText.includes("snow") ||
+      conditionText.includes("sleet")
+    ) {
+      weatherCategory = "snowy";
+    } else {
+      weatherCategory = "sunny";
+    }
+
+    console.log(weatherCategory);
+    return weatherCategory;
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+  }
+}
 
 module.exports = { getTotalRouteTimeforMultipleRoutes, selectModeOfTransport };

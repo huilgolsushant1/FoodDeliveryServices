@@ -20,7 +20,7 @@ async function getRouteData(
   }
 }
 
-router.get("/route", async (req, res) => {
+router.get("/routedata", async (req, res) => {
   try {
     let sourceAddress = req.body.sourceAddress;
     let destAddress = req.body.destAddress;

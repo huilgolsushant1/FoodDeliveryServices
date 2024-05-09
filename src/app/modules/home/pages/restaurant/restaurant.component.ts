@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-restaurant",
@@ -6,63 +7,29 @@ import { Component } from "@angular/core";
   styleUrls: ["./restaurant.component.css"],
 })
 export class RestaurantComponent {
-  customerList = [
-    {
-      restaurantName: "HOTEL TAJ",
-      cartArray: [
-        {
-          customerName: "Prem Patil",
-          orderNumber: 12234,
-          orderedItems: "masala dosa(1),jira rice(2)",
-        },
-        {
-          customerName: "Kalpesh Patil",
-          orderNumber: 12234,
-          orderedItems: "masala dosa(1),jira rice(2)",
-        },
-      ],
-    },
-    {
-      restaurantName: "HOTEL KRISHNA",
-      cartArray: [
-        {
-          customerName: "Rahul Patil",
-          orderNumber: 12234,
-          orderedItems: "masala dosa(1),jira rice(2)",
-        },
-        {
-          customerName: "Vedant Patil",
-          orderNumber: 12234,
-          orderedItems: "masala dosa(1),jira rice(2)",
-        },
-      ],
-    },
-    {
-      restaurantName: "EXPRESS INN",
-      cartArray: [
-        {
-          customerName: "Kalyani Patil",
-          orderNumber: 12234,
-          orderedItems: "masala dosa(1),jira rice(2)",
-        },
-        {
-          customerName: "Pooj Patil",
-          orderNumber: 12234,
-          orderedItems: "masala dosa(1),jira rice(2)",
-        },
-      ],
-    },
-  ];
-
+  customerList: any;
   buttonStates: boolean[][] = [];
   panelOpenState = false;
+  restaurants: any;
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.customerList.forEach((customer) => {
+    this.http
+      .get<any[]>("http://localhost:3001/api/getRestaurants/orders")
+      .subscribe((pendingOrders) => {
+        this.customerList = pendingOrders;
+        console.log(this.customerList);
+        this.createOrderCart();
+      });
+  }
+
+  createOrderCart() {
+    console.log(this.customerList);
+
+    this.customerList.forEach((customer: any) => {
       const states: boolean[] = [];
-      customer.cartArray.forEach((item) => {
+      customer.orderArray.forEach((item: any) => {
         states.push(false);
       });
       this.buttonStates.push(states);
@@ -73,5 +40,11 @@ export class RestaurantComponent {
   onPreparingFoodClicked(customerIndex: number, itemIndex: number) {
     this.buttonStates[customerIndex][itemIndex] =
       !this.buttonStates[customerIndex][itemIndex];
+  }
+
+  formatOrderItems(orderItems: any[]): string {
+    return orderItems
+      .map((item) => `${item.dish}: ${item.quantity}`)
+      .join(", ");
   }
 }
