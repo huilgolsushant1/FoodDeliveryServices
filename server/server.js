@@ -8,8 +8,8 @@ const topRatedRouter = require("./routers/topRated.js");
 const getWeatherRouter = require("./routers/getWeather.js");
 const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
 const orderRouter = require("./routers/orderRouter.js");
-const allocateRider = require("./routers/riderAllocationRouter.js");
-const { mongoClient } = require('./database.js');
+const riderRouter = require("./routers/riderRouter.js");
+const { mongoClient, redisClient } = require('./database.js');
 const getCustomerRouter = require("./routers/getCustomers.js")
 
 const app = express();
@@ -30,7 +30,7 @@ app.use("/api/order", orderRouter );
 
 app.use("/api/topRated", topRatedRouter);
 app.use("/api/getCustomers", getCustomerRouter);
-app.use("/api/path", allocateRider);
+app.use("/api/path", riderRouter);
 app.get("/api/addresses",  async (req, res)=>{
     try{
         const session = dbConnections.neo4jClient.session(); 
@@ -58,6 +58,8 @@ app.get("/api/addresses",  async (req, res)=>{
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+app.use("/api/rider", riderRouter);
+
 
 //Top Influencer picks api
 app.get('/api/banners/getTop5', async (req, res) => {
@@ -98,36 +100,16 @@ app.get('/api/banners/getTop5', async (req, res) => {
 app.get("/api/banners/getAdditionalDetails/:id", async (req, res) => {
   try {
     const restaurantId = req.params.id;
-    const session = dbConnections.neo4jClient.session(); // Create a new session
-    const result = await session.readTransaction(async (tx) => {
-      // Begin a read transaction
-      const query = `
-                MATCH (restaurant:Restaurant{id: $restaurantId})-[:SERVES]->(dish:Dish)-[:BELONGSTO]->(cuisine:Cuisine)
-                OPTIONAL MATCH (restaurant)-[reviewRel:REVIEWED]->(customer:Customer)
-                WHERE reviewRel IS NOT NULL AND customer IS NOT NULL
-                WITH restaurant, cuisine, dish, COLLECT({review: reviewRel, customer: customer}) AS reviews
-                RETURN {
-                    restaurantdetails: {
-                        cuisine: COLLECT(DISTINCT cuisine.name),
-                        dish: COLLECT(DISTINCT dish.name)
-                    }
-                } AS result
-            `;
-      const queryResult = await tx.run(query, {
-        restaurantId: parseInt(restaurantId),
-      });
-      return queryResult.records.map((record) => {
-        const { cuisine, dish } = record.get("result").restaurantdetails; // Extracts cuisine and dish arrays
-
-        return { cuisine, dish };
-      });
-    });
-    session.close();
-    res.json(result);
-  } catch (error) {
-    console.error("Error fetching data from Neo4j:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
+    const db = mongoClient.db("FoodDeliveryService");
+    const collection = db.collection("restaurants");
+    const restaurants = await collection.find({
+        id: restaurantId
+    }).toArray();
+    res.json(restaurants);
+} catch (error) {
+    console.error('Error fetching data from MongoDB:', error);
+    res.status(500).json({ error: 'Internal server error' });
+}
 });
 
 // Reviews api
@@ -194,6 +176,9 @@ app.use((err, req, res, next) => {
     res.sendStatus(500);
 })
 
+process.on("exit", function(){
+  redisClient.quit();
+});
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });

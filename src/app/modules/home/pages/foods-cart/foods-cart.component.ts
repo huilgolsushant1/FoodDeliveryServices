@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Neo4jService } from 'src/app/neo4j.service';
 
 @Component({
   selector: 'app-foods-cart',
@@ -16,12 +17,14 @@ export class FoodsCartComponent implements OnInit {
   cartTotal: number = 0;
   ordersData: any;
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) { }
+  constructor(private http: HttpClient, 
+    private route: ActivatedRoute, 
+    private neo4jService: Neo4jService,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.ordersData = JSON.parse(sessionStorage.getItem('orderData') || '{}');
     console.log(this.ordersData);
-    
     this.fetchRestaurants();
   }
 
@@ -55,5 +58,11 @@ export class FoodsCartComponent implements OnInit {
 
   calculateCartTotal() {
     this.cartTotal = this.cart.reduce((total, item) => total + item.price, 0);
+  }
+
+  placeOrder() {
+    this.neo4jService.placeOrder(this.ordersData).subscribe(res => {
+      this.router.navigate(['/cart']);
+    })
   }
 }

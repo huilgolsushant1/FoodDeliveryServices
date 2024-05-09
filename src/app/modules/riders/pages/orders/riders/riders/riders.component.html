@@ -1,0 +1,25 @@
+<!-- rider-list.component.html -->
+<h2>Riders List</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Vehicle Type</th>
+
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let rider of riders">
+        <td>{{ rider.id }}</td>
+      <td>{{ rider.name }}</td>
+      <td>{{ rider.vehicleType }}</td>
+      <td>{{ rider.status }}</td>
+      <td><button (click)="selectrider(rider)">Select</button></td>
+    </tr>
+  </tbody>
+</table>
+

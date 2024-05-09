@@ -2,109 +2,114 @@ const { calculateShortestPath } = require('./pathCalculationController.js')
 const { selectModeOfTransport } = require('./modeOfTransportController.js')
 const { redisClient, mongoClient } = require('../database.js')
 const { calculateTotalPrice } = require('../routers/getDynamicPrice.js')
+const { getDriverLocation } = require('./allocateRider.js')
 const placeTheOrder = async (req, res) => {
     try {
 
-        let reqObj = {
-            "shortestPaths": [
-                {
-                    "path": [],
-                    "distance": 2345,
-                    "totalTravelTime": 30
-                },
-                {
-                    "path": [],
-                    "distance": 2345,
-                    "totalTravelTime": 30
-                },
-                {
-                    "path": [],
-                    "distance": 2345,
-                    "totalTravelTime": 30
-                }
-            ],
-            "weather": "snowy",
-            "orderDetails": {
-                "orderId": "123",
-                "restaurantId": 123,
-                "restaurantName": "Kalesh's Corner",
-                "orderedItems": [{
-                    "dish": "Waffles - choco",
-                    "price": "123",
-                    "quantity": 2
-                },
-                {
-                    "dish": "Waffles - cherry",
-                    "price": "123",
-                    "quantity": 2
-                }
-                ],
-                "customerName": "Kalesh Patil",
-                "customerId":1,
-                "deliveryAddress": "Kalesh's Cross",
-                "totalPrice": 2300,
-                "rider": {
-                    "riderId": 8,
-                    "riderName": "Kalesh's Rider",
-                    "modeOfTransport": "Car",
-                    "deliveryCharge": "200"
-                },
-                "orderStatus": "Pending"
-            }
+        let reqObj = req.body;
+        // {
+        //     "shortestPaths": [
+        //         {
+        //             "path": [],
+        //             "distance": 2345,
+        //             "totalTravelTime": 30
+        //         },
+        //         {
+        //             "path": [],
+        //             "distance": 2345,
+        //             "totalTravelTime": 30
+        //         },
+        //         {
+        //             "path": [],
+        //             "distance": 2345,
+        //             "totalTravelTime": 30
+        //         }
+        //     ],
+        //     "weather": "snowy",
+        //     "orderDetails": {
+        //         "orderId": "123",
+        //         "restaurantId": 123,
+        //         "restaurantName": "Kalesh's Corner",
+        //         "orderedItems": [{
+        //             "dish": "Waffles - choco",
+        //             "price": "123",
+        //             "quantity": 2
+        //         },
+        //         {
+        //             "dish": "Waffles - cherry",
+        //             "price": "123",
+        //             "quantity": 2
+        //         }
+        //         ],
+        //         "customerName": "Kalesh Patil",
+        //         "customerId":1,
+        //         "deliveryAddress": "Kalesh's Cross",
+        //         "totalPrice": 2300,
+        //         "rider": {
+        //             "riderId": 8,
+        //             "riderName": "Kalesh's Rider",
+        //             "modeOfTransport": "Car",
+        //             "deliveryCharge": "200"
+        //         },
+        //         "orderStatus": "Pending"
+        //     }
 
-        }
+        // }
 
-        const shortestPaths = [
-            {
-                "path": [],
-                "distance": 2345,
-                "totalTravelTime": 30
-            },
-            {
-                "path": [],
-                "distance": 2345,
-                "totalTravelTime": 30
-            },
-            {
-                "path": [],
-                "distance": 2345,
-                "totalTravelTime": 30
-            }
-        ];
-        const weather = "snowy";
-        const orderDetails = {
-            "orderId": "123",
-            "restaurantId": 123,
-            "restaurantName": "Kalesh's Corner",
-            "orderedItems": [{
-                "dish": "Waffles - choco",
-                "price": "123",
-                "quantity": 2
-            },
-            {
-                "dish": "Waffles - cherry",
-                "price": "123",
-                "quantity": 2
-            }
-            ],
-            "customerId":1,
-            "customerName": "Kalesh Patil",
-            "deliveryAddress": "Kalesh's Cross",
-            "totalPrice": 2300,
-            "rider": {
-                "riderId": 6,
-                "riderName": "Kalesh's Rider",
-                "modeOfTransport": "Car",
-                "deliveryCharge": "200"
-            },
-            "orderStatus": "Pending"
-        };
+        // const shortestPaths = [
+        //     {
+        //         "path": [],
+        //         "distance": 2345,
+        //         "totalTravelTime": 30
+        //     },
+        //     {
+        //         "path": [],
+        //         "distance": 2345,
+        //         "totalTravelTime": 30
+        //     },
+        //     {
+        //         "path": [],
+        //         "distance": 2345,
+        //         "totalTravelTime": 30
+        //     }
+        // ];
+        // const weather = "snowy";
+        // const orderDetails = {
+        //     "orderId": "123",
+        //     "restaurantId": 123,
+        //     "restaurantName": "Kalesh's Corner",
+        //     "orderedItems": [{
+        //         "dish": "Waffles - choco",
+        //         "price": "123",
+        //         "quantity": 2
+        //     },
+        //     {
+        //         "dish": "Waffles - cherry",
+        //         "price": "123",
+        //         "quantity": 2
+        //     }
+        //     ],
+        //     "customerId":1,
+        //     "customerName": "Kalesh Patil",
+        //     "deliveryAddress": "Kalesh's Cross",
+        //     "totalPrice": 2300,
+        //     "rider": {
+        //         "riderId": 6,
+        //         "riderName": "Kalesh's Rider",
+        //         "modeOfTransport": "Car",
+        //         "deliveryCharge": "200"
+        //     },
+        //     "orderStatus": "Pending"
+        // };
 
         // //store this in redis key
         // let encoded=Buffer.from("Hello World").toString('base64');
         // console.log(Buffer.from(encoded, 'base64').toString('ascii'));
 
-        await redisClient.set(Buffer.from(reqObj.orderDetails.customerName.toLowerCase().trim().replace(' ', '') + reqObj.orderDetails.customerId).toString('base64'), JSON.stringify(reqObj));
+        //allocate rider to order
+        let response=reqObj;
+        response.orderDetails.rider=await getDriverLocation(reqObj.orderDetails.restaurantName, reqObj.orderDetails.rider.modeOfTransport)
+        
 
         //add it to mongo db 
         const db = mongoClient.db("FoodDeliveryService");
@@ -112,10 +117,11 @@ const placeTheOrder = async (req, res) => {
 
         const resultInsert = await ordersCollection.insertOne(reqObj.orderDetails);
         console.log(resultInsert)
-
+         
         //update rider status 
         const riderCollection = db.collection("riders");
-        const filter = { "id": reqObj.orderDetails.rider.riderId };
+        console.log(response.orderDetails.rider.riderId.low)
+        const filter = { "id": response.orderDetails.rider.riderId.low };
         console.log(JSON.stringify(filter))
         const updatedDocument = {
             $set: {
@@ -125,9 +131,12 @@ const placeTheOrder = async (req, res) => {
 
         const resultUpdate = await riderCollection.updateOne(filter, updatedDocument);
         console.log(resultUpdate)
+
         if (resultInsert.insertedId && resultUpdate.modifiedCount) {
+            await redisClient.set(Buffer.from(response.orderDetails.customerName.toLowerCase().trim().replace(' ', '') + response.orderDetails.customerId).toString('base64'), JSON.stringify(response));
             res.status(200).json({
                 success: true,
+                data:response,
                 message: "Order Confirmed!"
             });
         }
@@ -151,27 +160,7 @@ const placeTheOrder = async (req, res) => {
 const checkPrice = async (req, res) => {
     try {
 
-        let reqObj = {
-            "restaurantId": 123,
-            "restaurantName": "SINWISE LLC",
-            "orderedItems": [{
-                "dish": "Waffles - choco",
-                "price": "123",
-                "cuisine": "beverages",
-                "quantity": 2
-            },
-            {
-                "dish": "Waffles - cherry",
-                "price": "123",
-                "cuisine": "cold drinks",
-                "quantity": 2
-            }
-            ],
-            "totalPrice": "200",
-            "customerName": "Kalesh Patil",
-            "customerId":1,
-            "deliveryAddress": "150 W HILL PL BRISBANE, CA 94005"
-        }
+        let reqObj = req.body;
 
         let shortestPaths =await calculateShortestPath(reqObj.restaurantName, reqObj.deliveryAddress);
         console.log(shortestPaths)
