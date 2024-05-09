@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Neo4jService } from "../../../../neo4j.service";
 import { RidersService } from "src/app/modules/share/service/riders.service";
 
@@ -24,18 +24,40 @@ export class FoodDetailsComponent implements OnInit {
   showDropdown: boolean = false;
   filteredItems: string[] = [];
 
-
+  customerData: any;
   orderData: any;
+
+  orderSample = {
+    "restaurantId":123,
+    "restaurantName":"Kalesh's Corner",
+    "orderedItems":[{
+        "dish":"Waffles - choco",
+        "price":"123",
+        "quantity":2
+      },
+      {
+        "dish":"Waffles - cherry",
+        "price":"123",
+        "quantity":2
+      }
+    ],
+    "totalPrice":"200",
+    "customerName":"Kalesh Patil",
+    "deliveryAddress":"Kalesh's Cross"
+}
   
   constructor(
     private neo4jService: Neo4jService,
     private route: ActivatedRoute,
-    private ridersService: RidersService
+    private ridersService: RidersService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.restaurant = history.state.restaurant;
-    console.log(this.restaurant);
+    this.customerData = JSON.parse(sessionStorage.getItem('customer') || '{}');
+    console.log(this.customerData);
+    
     this.restaurantId = this.restaurant.restaurantDetails.properties.id.low;
     this.getReviews();
     this.getAdditionalDetails();
@@ -151,16 +173,19 @@ export class FoodDetailsComponent implements OnInit {
   }
 
   createObject() {
-    this.orderData = {
-      "restaurantId": this.restaurantId,
-      "restaurantName": this.restaurant.name,
-      "totalPrice": this.totalPrice,
-      "orderedItems": this.getOrderItems(),
-      "customerName":"Kalesh Patil",
-      "deliveryAddress":  this.selected
-    }
-    console.log(this.orderData);
-    
+    // this.orderData = {
+    //   "restaurantId": this.restaurantId,
+    //   "restaurantName": this.restaurant.name,
+    //   "totalPrice": this.totalPrice,
+    //   "orderedItems": this.getOrderItems(),
+    //   "customerName": this.customerData.name,
+    //   "customerId": this.customerData.id,
+    //   "deliveryAddress":  this.selected,
+    // }
+    this.orderSample.deliveryAddress = this.selected;
+    this.orderSample = this.orderSample;
+    sessionStorage.setItem('orderData', JSON.stringify(this.orderSample));
+    this.router.navigate(['/cart']);
   }
 
 }

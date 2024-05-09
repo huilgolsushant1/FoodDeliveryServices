@@ -14,11 +14,11 @@ const routes: Routes = [
     component:DefaultLayoutComponent,
     children:[
       {
-        path:'',
+        path:'home',
         component:RestaurantBannersComponent
       },
       {
-        path:'customers',
+        path:'',
         component:CustomersComponent
       },
       {

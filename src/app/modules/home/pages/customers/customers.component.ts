@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-customers',
@@ -9,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 export class CustomersComponent implements OnInit{
   customers: any[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     sessionStorage.clear();
@@ -27,6 +28,7 @@ export class CustomersComponent implements OnInit{
     );
   }
   selectCustomer(customer: any) {
-    sessionStorage.setItem('customer', customer);
+    sessionStorage.setItem('customer', JSON.stringify(customer));
+    this.router.navigate(['/home']);
   }
 }
