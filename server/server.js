@@ -59,6 +59,7 @@ app.get("/api/addresses",  async (req, res)=>{
     }
 });
 
+//Top Influencer picks api
 app.get('/api/banners/getTop5', async (req, res) => {
     try {
         const session = dbConnections.neo4jClient.session(); 
@@ -85,7 +86,7 @@ app.get('/api/banners/getTop5', async (req, res) => {
         return { restaurantDetails, name, influencerVisits, avgRating };
       });
     });
-    session.close(); // Close the session
+    session.close(); 
     res.json(result);
   } catch (error) {
     console.error("Error fetching data from Neo4j:", error);
@@ -93,6 +94,7 @@ app.get('/api/banners/getTop5', async (req, res) => {
   }
 });
 
+//Cuisine & dish api 
 app.get("/api/banners/getAdditionalDetails/:id", async (req, res) => {
   try {
     const restaurantId = req.params.id;
@@ -115,12 +117,12 @@ app.get("/api/banners/getAdditionalDetails/:id", async (req, res) => {
         restaurantId: parseInt(restaurantId),
       });
       return queryResult.records.map((record) => {
-        const { cuisine, dish } = record.get("result").restaurantdetails; // Extract cuisine and dish arrays
+        const { cuisine, dish } = record.get("result").restaurantdetails; // Extracts cuisine and dish arrays
 
         return { cuisine, dish };
       });
     });
-    session.close(); // Close the session
+    session.close();
     res.json(result);
   } catch (error) {
     console.error("Error fetching data from Neo4j:", error);
@@ -128,6 +130,7 @@ app.get("/api/banners/getAdditionalDetails/:id", async (req, res) => {
   }
 });
 
+// Reviews api
 app.get("/api/banners/getReviews/:id", async (req, res) => {
   try {
     const restaurantId = req.params.id;
@@ -161,11 +164,12 @@ app.get("/api/banners/getReviews/:id", async (req, res) => {
   }
 });
 
+// Average cost for two api
 app.get("/api/banners/getAvgCostForTwo/:id", async (req, res) => {
   try {
     const restaurantId = req.params.id;
-    const session = dbConnections.neo4jClient.session(); // Create a new session
-    const result = await session.readTransaction(async tx => { // Begin a read transaction
+    const session = dbConnections.neo4jClient.session(); 
+    const result = await session.readTransaction(async tx => { 
       const query = `
         MATCH (r:Restaurant {id: $restaurantId})<-[rev:REVIEWED]-()
         WHERE rev.costForTwo IS NOT NULL
@@ -184,6 +188,11 @@ app.get("/api/banners/getAvgCostForTwo/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.sendStatus(500);
+})
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
