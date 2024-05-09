@@ -10,8 +10,8 @@ async function getCuisineRestaurantsController(req, res) {
       MATCH (cuisine:Cuisine)<-[:BELONGSTO]-(dish:Dish)<-[:SERVES]-(restaurant:Restaurant)<-[review:REVIEWED]-(customer:Customer)
       WITH cuisine, restaurant, round(avg(review.rating) * 10) / 10 AS avgRating
       ORDER BY cuisine.name, avgRating DESC
-      WITH cuisine, collect({name: restaurant.name, avgRating: avgRating})[..5] AS topRestaurants
-      RETURN cuisine.name AS cuisine, topRestaurants
+      WITH cuisine, collect({restaurant_id: restaurant.id, name: restaurant.name, avgRating: avgRating})[..5] AS topRestaurants
+      RETURN cuisine.name AS cuisine, topRestaurants 
     `;
 
     const result = await session.run(cuisineRestaurantsQuery);

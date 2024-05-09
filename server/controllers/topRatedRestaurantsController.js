@@ -12,7 +12,7 @@ async function topRatedRestaurantsController(req, res) {
     MATCH (restaurant:Restaurant)<-[rev:REVIEWED]-()
     WHERE point.distance(customerLocation, restaurant.location) <= 10000
     WITH restaurant, point.distance(customerLocation, restaurant.location) AS distanceInMeters, avg(rev.rating) AS avgRating
-    RETURN restaurant.name, round(distanceInMeters / 1000, 1) AS distanceInKms, toFloat(round(avgRating * 10) / 10) AS avgRating
+    RETURN restaurant.id, restaurant.name, round(distanceInMeters / 1000, 1) AS distanceInKms, toFloat(round(avgRating * 10) / 10) AS avgRating
     ORDER BY avgRating DESC
     LIMIT 5
   `;
@@ -31,7 +31,8 @@ async function topRatedRestaurantsController(req, res) {
       topRatedRestaurants.push({
         "restaurant_name": record.get("restaurant.name"),
         "distanceInKms": record.get("distanceInKms"),
-        "avgRating": record.get("avgRating")
+        "avgRating": record.get("avgRating"),
+        "restaurant_id": record.get("restaurant.id")
       });
     });
 

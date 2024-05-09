@@ -1,12 +1,18 @@
 const express = require("express");
 const { distinct } = require("rxjs");
+const { redisClient } = require("../database");
 
 const apiKey = "C67ws6JZAR0GlvAzBtGoK4FRo5iNQfkA";
 
 //Main Function
-async function selectModeOfTransport(data, orderItesm, isDelicate) {
+async function selectModeOfTransport(
+  data,
+  orderedItems,
+  customerName,
+  customerId
+) {
   try {
-    let orderQuantity = orderItesm.length;
+    let orderQuantity = orderedItems.length;
     let distance = data.distance / 1000;
     let modeOfTransport = "bike";
     let hasDelayInOrder = flase;
@@ -17,6 +23,11 @@ async function selectModeOfTransport(data, orderItesm, isDelicate) {
     }`;
 
     let weatherCondition = getWeatherData(destinationCoords);
+    let isDelicate = isOrderDelicate(orderedItems);
+    let key = Buffer.from(
+      customerName.toLowerCase().trim().replace(" ", "") + customerId
+    ).toString("base64");
+
     let car = await getRouteData(
       apiKey,
       sourceCoords,
@@ -78,6 +89,13 @@ async function selectModeOfTransport(data, orderItesm, isDelicate) {
         modeOfTransport = "car";
       }
     }
+
+    let newData = {
+      weatherCondition: weatherCondition,
+      modeOfTransport: modeOfTransport,
+    };
+
+    setOrder(key, newData);
 
     return modeOfTransport;
   } catch (error) {
@@ -194,8 +212,8 @@ async function getTotalRouteTimeforMultipleRoutes(pathArrays, modeOfTransport) {
     //   }
     // });
   }
- 
-    return pathArrays;
+
+  return pathArrays;
 }
 
 //Function to check the availibilty of rider for selected mode of transport
@@ -245,4 +263,51 @@ async function getWeatherData(location) {
   }
 }
 
+//Function to check the order is delicate or not
+function isOrderDelicate(orderedItems) {
+  const delicateCuisines = ["beverages", "cold drinks", "cake"];
+  for (let i = 0; i < orderedItems.length; i++) {
+    const item = orderedItems[i];
+    if (delicateCuisines.includes(item.cuisine)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+//Function to updates real time data in redis database
+async function setOrder(code, newData) {
+  try {
+    let orderData = await redisClient.get(String(code));
+    let data = JSON.parse(orderData);
+
+    data.weather = newData.weatherCondition;
+    let rider = {
+      riderId: "",
+      riderName: "",
+      modeOfTransport: newData.modeOfTransport,
+      deliveryCharge: "",
+    };
+    data.orderDetails.rider = rider;
+    await redisClient.set(String(code), JSON.stringify(data));
+    redisClient.quit();
+    return "Order successfully set!";
+  } catch (error) {
+    console.error("Error setting order in Redis:", error);
+    throw error;
+  }
+}
+
+let customerName = "Dileep";
+let customerId = 5;
+let code = Buffer.from(
+  customerName.toLowerCase().trim().replace(" ", "") + customerId
+).toString("base64");
+
+let newData = {
+  weatherCondition: "rainy",
+  modeOfTransport: "bike",
+};
+
+setOrder(code, newData);
 module.exports = { getTotalRouteTimeforMultipleRoutes, selectModeOfTransport };
