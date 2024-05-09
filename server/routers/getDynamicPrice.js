@@ -1,24 +1,51 @@
-// Sample data for demonstration
-const baseFare = 20; // Base fare for any ride
+const { mongoClient } = require('../database');
+
+const baseFare = 20; 
 
 // distance
 function calculateDistanceIncrement(distance) {
-  if (distance < 1000) {
+   if (distance <= 1000) {
     return 0;
   }
-  return ((((distance - 1000) % 500) / 10) * baseFare);
+  const excessDistance = distance - 1000;
+  const distanceIncrement = Math.ceil(excessDistance / 500) * (baseFare / 10);
+  return distanceIncrement;
 }
 
 // weather condition
 function calculateWeatherIncrement(weather) {
   const weatherFactor = 0.2; // Additional charge for bad weather
-  return weather === 'rainy' || 'snowy' ? baseFare * weatherFactor : 0;
+  return weather === 'rainy' || weather === 'snowy' ? baseFare * weatherFactor : 0;
 }
 
-// demand
-function calculateDemandIncrement(demand) {
-  const demandFactor = 0.3; 
-  return demand === 'high' ? baseFare * demandFactor : 0;
+async function calculateDemandIncrement(mode) {
+  const demandFactor = 0.3;
+  try {
+    await mongoClient.connect();
+    const db = mongoClient.db("FoodDeliveryService");
+    const ordersCollection = db.collection("orders");
+    const ridersCollection = db.collection("riders");
+
+    const pendingOrdersCount = await ordersCollection.countDocuments({
+      orderStatus: 'Pending',
+      "rider.modeOfTransport": { "$regex": mode, "$options": "i" }
+    });
+
+    const availableRidersCount = await ridersCollection.countDocuments({
+      status: { $ne: 'offline' },
+      vehicleType: { "$regex": mode, "$options": "i" }
+    });
+
+    const demand = pendingOrdersCount / 1;
+    if (demand > 2) {
+      return baseFare * demandFactor;
+    }
+    return 0;
+    
+  } catch (error) {
+    console.error("Error fetching pending orders and available riders:", error);
+    throw error; // Decide whether to handle errors or throw them
+  }
 }
 
 //mode of transport
@@ -39,28 +66,18 @@ function calculateModeIncrement(mode) {
 }
 
 // Function to calculate total price
-function calculateTotalPrice(distance, customerName, customerId, mode) {
+async function calculateTotalPrice(distance, weather, mode) {
   //redis weather key Buffer.from(customerName.toLowerCase().trim().replace(' ', '') + customerId).toString('base64')
   //demand from db
+  
   const distanceIncrement = calculateDistanceIncrement(distance);
-  const weatherIncrement = calculateWeatherIncrement("snowy");
-  const demandIncrement = 23;//calculateDemandIncrement(demand);
+  const weatherIncrement = calculateWeatherIncrement(weather);
+  const demandIncrement = await calculateDemandIncrement(mode);
   const modeIncrement = calculateModeIncrement(mode);
+  console.log(demandIncrement);
 
   const totalPrice = baseFare + distanceIncrement + weatherIncrement + demandIncrement + modeIncrement;
   return totalPrice;
 }
 
-// Function to calculate dynamic pricing
-function calculatePrice(distance, weather, demand, mode) {
-  try {
-    // Calculate total price based on the provided dynamic values
-    const totalPrice = calculateTotalPrice(distance, weather, demand, mode);
-    return { totalPrice };
-  } catch (error) {
-    console.error("Error calculating price:", error);
-    throw new Error('Server Error');
-  }
-}
-
-module.exports = { calculateTotalPrice };
+module.exports = calculateTotalPrice;

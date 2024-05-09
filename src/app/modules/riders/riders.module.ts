@@ -7,14 +7,14 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { TextTransformPipe } from '../share/pipes/text-transform.pipe';
-import { RidersListComponent } from './pages/orders/riders-list/riders-list.component';
+import { RidersComponent } from './pages/orders/riders/riders/riders.component';
 
 
 @NgModule({
   declarations: [
     OrdersComponent,
     TextTransformPipe,
-    RidersListComponent
+    RidersComponent
   ],
   imports: [
     CommonModule,
