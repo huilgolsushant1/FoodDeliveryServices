@@ -34,11 +34,17 @@ const neo4jClient = neo4j.driver(process.env.NEO4J_URI, neo4j.auth.basic(process
 
 
 const redisClient = createClient({
-  password: 'VOCTYVir9slBSjvdvZK6p6y6a2Mxu13B',
-  socket: {
-      host: 'redis-10637.c311.eu-central-1-1.ec2.redns.redis-cloud.com',
-      port: 10637
-  }
+
+    password: 'KzoQOukFIKHhlqcwCbymfUtIQxhtHvQx',
+
+    socket: {
+
+        host: 'redis-13493.c328.europe-west3-1.gce.redns.redis-cloud.com',
+
+        port: 13493
+
+    }
+
 });
 
 // Promisify client.get function

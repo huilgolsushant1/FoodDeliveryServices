@@ -8,8 +8,8 @@ const topRatedRouter = require("./routers/topRated.js");
 const getWeatherRouter = require("./routers/getWeather.js");
 const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
 const orderRouter = require("./routers/orderRouter.js");
-const allocateRider = require("./routers/riderAllocationRouter.js");
-const { mongoClient } = require('./database.js');
+const riderRouter = require("./routers/riderRouter.js");
+const { mongoClient, redisClient } = require('./database.js');
 const getCustomerRouter = require("./routers/getCustomers.js")
 
 const app = express();
@@ -30,7 +30,7 @@ app.use("/api/order", orderRouter );
 
 app.use("/api/topRated", topRatedRouter);
 app.use("/api/getCustomers", getCustomerRouter);
-app.use("/api/path", allocateRider);
+app.use("/api/path", riderRouter);
 app.get("/api/addresses",  async (req, res)=>{
     try{
         const session = dbConnections.neo4jClient.session(); 
@@ -58,6 +58,8 @@ app.get("/api/addresses",  async (req, res)=>{
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+app.use("/api/rider", riderRouter);
+
 
 //Top Influencer picks api
 app.get('/api/banners/getTop5', async (req, res) => {
@@ -174,6 +176,9 @@ app.use((err, req, res, next) => {
     res.sendStatus(500);
 })
 
+process.on("exit", function(){
+  redisClient.quit();
+});
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
