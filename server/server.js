@@ -9,12 +9,13 @@ const getWeatherRouter = require("./routers/getWeather.js");
 const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
 const orderRouter = require("./routers/orderRouter.js");
 const riderRouter = require("./routers/riderRouter.js");
-const { mongoClient, redisClient } = require('./database.js');
+const { mongoClient, redisClient, connectRedisDB } = require('./database.js');
 const getCustomerRouter = require("./routers/getCustomers.js")
 
 const app = express();
 const port = process.env.PORT;
 
+connectRedisDB();
 dbConnections.connectMongoDB();
 const neo4jClient=dbConnections.neo4jClient;
 // Middleware
@@ -191,9 +192,9 @@ app.use((err, req, res, next) => {
     res.sendStatus(500);
 })
 
-process.on("exit", function(){
-  redisClient.quit();
-});
+// process.on("exit", function(){
+//   redisClient.quit();
+// });
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
