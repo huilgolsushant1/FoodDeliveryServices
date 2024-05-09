@@ -32,7 +32,7 @@ const placeTheOrder = async (req, res) => {
           SET r.status = 'assigned'
           RETURN r
           `;
-          const riderId = response.orderDetails.rider.riderId.low;
+          const riderId = response.orderDetails.rider.riderId;
           const result = await session.run(routeQuery, { riderId });
           console.log('Rider Updated Status', riderId);
          

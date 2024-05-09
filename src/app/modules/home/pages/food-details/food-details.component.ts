@@ -35,7 +35,7 @@ export class FoodDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    
+    this.customerData = JSON.parse(sessionStorage.getItem('customer') || '{}');
     this.restaurantId = this.route.snapshot.paramMap.get('id');
     this.getReviews();
     this.getAdditionalDetails();
@@ -161,10 +161,10 @@ export class FoodDetailsComponent implements OnInit {
       "customerId": this.customerData.id,
       "deliveryAddress":  this.selected,
     }
-    // this.neo4jService.checkPrice(this.orderData).subscribe(res => {
-    //   sessionStorage.setItem('orderData', JSON.stringify(res));
-    //   this.router.navigate(['/cart']);
-    // })
+    this.neo4jService.checkPrice(this.orderData).subscribe(res => {
+      sessionStorage.setItem('orderData', JSON.stringify(res));
+      this.router.navigate(['/cart']);
+    })
   }
 
 }
