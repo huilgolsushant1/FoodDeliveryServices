@@ -21,6 +21,7 @@ export class RidersComponent {
     this.http.get<any[]>('http://localhost:3001/api/riders').subscribe(
       (data) => {
         this.riders = data;
+
       },
       (error) => {
         console.error('Error fetching customers:', error);
@@ -29,6 +30,6 @@ export class RidersComponent {
   }
   selectRider(rider: any) {
     sessionStorage.setItem('rider', JSON.stringify(rider));
-    this.router.navigate(['/rider']);
+    this.router.navigate(['/riders', rider.id]);
   }
 }

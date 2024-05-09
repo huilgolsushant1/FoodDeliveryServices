@@ -13,9 +13,9 @@ const getDriverLocation = async (restaurantName, vehicleType) => {
 
     const routeQuery = `
         MATCH (to:Restaurant{name:$restaurantName})-[:NEAREST_INTERSECTION]->(destination:Intersection)
-        WITH destination
+        WITH destination, to
         MATCH (from:Rider{status: 'available', vehicleType: $vehicleType})-[:NEAREST_INTERSECTION]->(source:Intersection)
-        WITH source, destination, collect(from) as sourceNodes
+        WITH source, destination, collect(from) as sourceNodes, to
         UNWIND sourceNodes as s1
         CALL gds.shortestPath.dijkstra.stream('sanMateo', {
         sourceNode: source,
@@ -27,7 +27,7 @@ const getDriverLocation = async (restaurantName, vehicleType) => {
             s1.id AS riderId,
             s1.name AS riderName,
             s1.location AS riderLocation, 
-            destination.location AS restaurantAddress, 
+            to.address+", "+to.city+", "+to.zip AS restaurantAddress, 
             totalCost,
             [nodeId IN nodeIds | [gds.util.asNode(nodeId).location.latitude, gds.util.asNode(nodeId).location.longitude]] AS path
         ORDER BY totalCost

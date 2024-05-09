@@ -4,6 +4,8 @@ import { Icon, icon, Marker } from "leaflet";
 import 'leaflet-routing-machine';
 import { RidersService } from "../../../share/service/riders.service"
 import { RidersModule } from '../../riders.module';
+import { ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 const customMarker = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png",
@@ -20,25 +22,25 @@ const customMarker = new L.Icon({
 export class OrdersComponent implements OnInit {
 
 
-  constructor(private ridersService: RidersService,
-  ) {
-    this.orderDetails={
-      "restaurantName":"Paakashala",
-      "restaurantAddress":"201 S DELAWARE AVE # B, SAN MATEO, 94401",
-      "orderId":"#1234",
-      "orderItems":[{
-        "dish":"Waffles",
-        "price":"123",
-        "quantity":2
-      },
-      {
-        "dish":"Waffles",
-        "price":"123",
-        "quantity":2
-      }],
-      "orderStatus":"readyForPickup"
-    }
-   }
+  constructor(private http: HttpClient, private ridersService: RidersService,private route: ActivatedRoute) {
+  //   this.orderDetails={
+  //     "restaurantName":"Paakashala",
+  //     "restaurantAddress":"201 S DELAWARE AVE # B, SAN MATEO, 94401",
+  //     "orderId":"#1234",
+  //     "orderItems":[{
+  //       "dish":"Waffles",
+  //       "price":"123",
+  //       "quantity":2
+  //     },
+  //     {
+  //       "dish":"Waffles",
+  //       "price":"123",
+  //       "quantity":2
+  //     }],
+  //     "orderStatus":"readyForPickup"
+  //   }
+  //  }
+  }
 
   orderDetails:any;
   statusToBeUpdated:string="";
@@ -51,10 +53,24 @@ export class OrdersComponent implements OnInit {
   showDropdown: boolean = false;
   restaurant: string = "NUTRICION CELLULAR"
   restaurantToDest: any;
+  riderId:number=0;
 
 
 
   ngOnInit() {
+
+    this.route.params.subscribe(params => {
+      this.riderId = params['id']; // Retrieve route parameter
+    });
+    this.http.get<any[]>(`http://localhost:3001/api/riders/order?riderId=${this.riderId}`).subscribe(
+      (data) => {
+        this.orderDetails = data?.[0];
+      },
+      (error) => {
+        console.error('Error fetching orders:', error);
+      }
+    );
+    
     Marker.prototype.options.icon = this.defaultIcon;
 
     this.map = L.map("map").setView([37.563434, -122.322255], 13);

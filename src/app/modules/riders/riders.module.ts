@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { TextTransformPipe } from '../share/pipes/text-transform.pipe';
-import { RidersComponent } from './pages/orders/riders/riders/riders.component';
+import { RidersComponent } from './pages/riders/riders/riders.component';
 
 
 @NgModule({
