@@ -1,22 +1,21 @@
 const express = require('express');
-const router = express.Router();
 const { driver } = require('../database.js')
 const neo4j = require('neo4j-driver');
 
 async function topBudgetRestaurantsController(req, res) {
 
   const {customerName} = req.query;
-  if(!customerName) res.sendStatus(500)
 
-  // Put your cypher query here
-  const topBudgetRestaurantsQuery = `MATCH (c:Customer {name: $customerName})-[:LIVES_AT]->(customerAddress:Address)
+  const topBudgetRestaurantsQuery = 
+  `MATCH (c:Customer {name: $customerName})-[:LIVES_AT]->(customerAddress:Address)
   WITH customerAddress.location AS customerLocation
   MATCH (restaurant:Restaurant)<-[rev:REVIEWED]-()
   WHERE rev.costForTwo IS NOT NULL AND point.distance(customerLocation, restaurant.location) <= 10000
   WITH restaurant, avg(rev.costForTwo) AS avgCostForTwo, point.distance(customerLocation, restaurant.location) AS distanceToCustomer
   RETURN restaurant.name,
          toInteger(avgCostForTwo) AS avgCostForTwo,
-         round(distanceToCustomer / 1000, 1) AS distanceToCustomerKms
+         round(distanceToCustomer / 1000, 1) AS distanceToCustomerKms, 
+         restaurant
   ORDER BY avgCostForTwo ASC
   LIMIT 5
   `;
@@ -40,20 +39,22 @@ async function topBudgetRestaurantsController(req, res) {
             "restaurant_name":records.get("restaurant.name"),
             "avgCostForTwo":records.get("avgCostForTwo"),
             "distanceToCustomerKms":records.get("distanceToCustomerKms"),
+            "restaurantDetails":records.get("restaurant")
           }); 
         },
         onCompleted: () => {
           session.close();
-          res.status(201).json({
+          res.status(200).json({
             success: true,
-            data: topBudgetRestaurants/**put data variable to be sent here*/,
+            data: topBudgetRestaurants, /*data variable that needs to be sent here*/
             message: "Top Rated Restaurants"
           });
         },
         onError: error => {
           console.log(error);
           session.close();
-          res.status(500).json({
+          res.status(500);
+          res.json({
             success: false,
             message: error.message
           });

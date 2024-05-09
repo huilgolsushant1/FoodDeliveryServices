@@ -1,9 +1,16 @@
 const express= require ('express');
 const { topBudgetRestaurantsController } = require('../controllers/topBudgetController');
+const { topRatedRestaurantsController } = require('../controllers/topRatedRestaurantsController');
+const { getCuisineRestaurantsController } = require('../controllers/getCuisineRestaurantsController');
 
-const topBudgetController = express.Router();
+const topRatedRouter = express.Router();
 
-topBudgetController.get("/restaurants", topBudgetRestaurantsController);
+// top rate budget friendly restaurants
+topRatedRouter.get("/restaurants", topBudgetRestaurantsController);
 // topRatedRouter.get("/influenc", topRatedRestaurantsController);
 
-module.exports=topBudgetController;
+topRatedRouter.get('/top-rated-restaurants', topRatedRestaurantsController);
+topRatedRouter.get("/cuisineRestaurants", getCuisineRestaurantsController);
+
+
+module.exports=topRatedRouter;

@@ -21,32 +21,19 @@ const calculateShortestPath = async (restaurantName, deliveryAddress) => {
     [nodeId IN nodeIds | [   gds.util.asNode(nodeId).location.latitude, gds.util.asNode(nodeId).location.longitude]] AS path
     ORDER BY index`;
 
-    let shortestPaths = []; 
 
-    session
-      .run(routeQuery, { restaurantName, deliveryAddress })
-      .subscribe({
-        onNext: records => {
-          shortestPaths.push({"distance":records.get("totalCost"),"path":records.get("path")}); 
+    const records = await session.run(routeQuery, { restaurantName, deliveryAddress });
+    const shortestPaths = records.records.map(record => ({
+      distance: record.get("totalCost"),
+      path: record.get("path"),
+    }));
 
-        },
-        onCompleted: async () => {
-          session.close();
-          console.log("hi")
-          shortestPaths=await getTotalRouteTimeforMultipleRoutes(shortestPaths, "motorcycle")
-          // res.status(201).json({
-          //   success: true,
-          //   data: shortestPaths,
-          //   message: "Shortest Paths Calculated"
-          // });
-          return shortestPaths;
-        },
-        onError: error => {
-          console.log(error);
-          session.close();
-          return [];
-        }
-      });
+    session.close();
+
+    const totalTimePaths = await getTotalRouteTimeforMultipleRoutes(shortestPaths, "motorcycle");
+
+    return totalTimePaths;
+
   } catch (error) {
     console.log(error);
     // res.status(500).json({

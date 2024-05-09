@@ -1,32 +1,60 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class Neo4jService {
+  private apiUrl = "http://localhost:3001/api";
 
-  private apiUrl = 'http://localhost:3001/api/banners/getTop5';
-  private _getReviews = 'http://localhost:3001/api/banners/getReviews';
-  private _getAdditionalDetails = 'http://localhost:3001/api/banners/getAdditionalDetails';
-  private _getAvgCostForTwo = 'http://localhost:3001/api/banners/getAvgCostForTwo';
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
+  getInfluencerPicks(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/banners/getTop5`);
+  }
 
-  getData(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getTopRestaurants(): Observable<any[]> {
+    return this.http
+      .get<any[]>(
+        `${
+          this.apiUrl
+        }/topRated/top-rated-restaurants?customerName=${encodeURIComponent(
+          "New Customer"
+        )}`
+      )
+      .pipe(map((response) => (response as any).data));
+  }
+
+  getTopCuisines(): Observable<any[]> {
+    return this.http
+      .get<any[]>(`${this.apiUrl}/topRated/cuisineRestaurants`)
+      .pipe(map((response) => (response as any).data));
+  }
+
+  getTopBudgetFriendly(): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/topRated/restaurants?customerName=${encodeURIComponent(
+        "New Customer"
+      )}`
+    ).pipe(map((response) => (response as any).data));
   }
 
   getReviews(id: any): Observable<any[]> {
-    return this.http.get<any[]>(`${this._getReviews}/${id}`);
+    return this.http.get<any[]>(`${this.apiUrl}/banners/getReviews/${id}`);
   }
-  
+
   getAdditionalDetails(id: any): Observable<any[]> {
-    return this.http.get<any[]>(`${this._getAdditionalDetails}/${id}`);
+    return this.http.get<any[]>(
+      `${this.apiUrl}/banners/getAdditionalDetails/${id}`
+    );
   }
+
   getAvgCostForTwo(id: any): Observable<any[]> {
-    return this.http.get<any[]>(`${this._getAvgCostForTwo}/${id}`);
+    return this.http.get<any[]>(
+      `${this.apiUrl}/banners/getAvgCostForTwo/${id}`
+    );
   }
 
   checkPrice(object: any): Observable<any[]> {
