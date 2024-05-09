@@ -1,54 +1,140 @@
 <app-carousel></app-carousel>
-  <div class="content">
-    <div class="card">
-      <div class="title">
-        <img src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png" alt="Avatar">
-        <h4>Influencer picks</h4>
-      </div>
-      <div class="contentInnerCard">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Influencer Visits</th>
-              <th>Rating</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let restaurant of top5Influencer" (click)="onRowClick(restaurant)" style="cursor: pointer;" class="hover-effect">
-              <td>{{ restaurant.name }}</td>
-              <td>{{ restaurant.influencerVisits.low }}</td>
-              <td>{{ restaurant.avgRating }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<div class="content">
+  <div class="card">
+    <div class="title">
+      <img
+        src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png"
+        alt="Avatar"
+      />
+      <h4>Influencer picks</h4>
+    </div>
+    <div class="contentInnerCard">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Influencer Visits</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let restaurant of topInfluencer"
+            (click)="onRowClick(restaurant)"
+            style="cursor: pointer"
+            class="hover-effect"
+          >
+            <td>{{ restaurant.name }}</td>
+            <td>{{ restaurant.influencerVisits.low }}</td>
+            <td>{{ restaurant.avgRating }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+  <div class="card">
+    <div class="title">
+      <img
+        src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png"
+        alt="Avatar"
+      />
+      <h4>Top Restaurants</h4>
+    </div>
+    <div class="contentInnerCard">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Distance</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let restaurant of topRestaurants"
+            (click)="onRowClick(restaurant)"
+            style="cursor: pointer"
+            class="hover-effect"
+          >
+            <td>{{ restaurant.restaurant_name }}</td>
+            <td>{{ restaurant.distanceInKms }}</td>
+            <td>{{ restaurant.avgRating }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="title">
+      <img
+        src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png"
+        alt="Avatar"
+      />
+      <h4>Top Cuisines</h4>
+      <select (change)="onCuisineChange($event)">
+        <option
+          [value]="cuisineItem.cuisine"
+          *ngFor="let cuisineItem of topCuisines"
+        >
+          {{ cuisineItem.cuisine }}
+        </option>
+      </select>
+    </div>
+
+    <div class="contentInnerCard">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let restaurant of topSelectedCuisine"
+            (click)="onRowClick(restaurant)"
+            style="cursor: pointer"
+            class="hover-effect"
+          >
+            <td>{{ restaurant.name }}</td>
+            <td>{{ restaurant.avgRating }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <div class="content">
-    <div class="card">
-      <div class="title">
-        <img src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png" alt="Avatar">
-        <h4>Top Restaurants</h4>
-      </div>
-      <div class="contentInnerCard">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Influencer Visits</th>
-              <th>Rating</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let restaurant of top5Influencer" (click)="onRowClick(restaurant)" style="cursor: pointer;" class="hover-effect">
-              <td>{{ restaurant.name }}</td>
-              <td>{{ restaurant.influencerVisits.low }}</td>
-              <td>{{ restaurant.avgRating }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="card">
+    <div class="title">
+      <img
+        src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png"
+        alt="Avatar"
+      />
+      <h4>Top Budget Friendly</h4>
+    </div>
+    <div class="contentInnerCard">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Budget</th>
+            <th>Distance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let restaurant of topBudgetFriendly"
+            (click)="onRowClick(restaurant)"
+            style="cursor: pointer"
+            class="hover-effect"
+          >
+            <td>{{ restaurant.restaurant_name }}</td>
+            <td>{{ restaurant.avgCostForTwo.low }}</td>
+            <td>{{ restaurant.distanceToCustomerKms }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
