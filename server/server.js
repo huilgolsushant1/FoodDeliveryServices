@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const topRatedRouter = require('./routers/topRated.js');
 const getWeatherRouter = require("./routers/getWeather.js");
 const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
+const orderRouter = require("./routers/orderRouter.js");
 
 const app = express();
 const port = process.env.PORT;
@@ -22,6 +23,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Router
 app.use("/api/path", pathCalculationRoutes);
 app.use("/api/getRestaurants", getRestaurantsRouter);
+app.use("/api/order", orderRouter );
+
 app.get("/api/addresses",  async (req, res)=>{
     try{
         const session = dbConnections.neo4jClient.session(); 

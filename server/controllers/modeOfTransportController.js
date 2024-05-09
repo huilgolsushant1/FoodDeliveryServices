@@ -153,10 +153,12 @@ async function getTotalRouteTimeforMultipleRoutes(
   pathArrays,
   modeOfTransport
 ) {
+  let shortestTravelTime = Infinity;
+  let shortestPath;
+
   for (let i = 0; i < pathArrays.length; i++) {
     let coordinates = sliceAtSpecificCount(pathArrays[i].path);
     let fastestMode = null;
-    let shortestTravelTime = Infinity;
     try {
       let totalTravelTime = 0;
 
@@ -166,10 +168,9 @@ async function getTotalRouteTimeforMultipleRoutes(
           coordinates[j + 1][1]
         }`;
         const routeUrl = `https://api.tomtom.com/routing/1/calculateRoute/${sourceCoords}:${destinationCoords}/json?key=${apiKey}&traffic=true&computeTravelTimeFor=all&routeType=fastest&language=en&instructionsType=tagged&travelMode=${modeOfTransport}`;
-        console.log(routeUrl)
         const routeResponse = await fetch(routeUrl);
         const trafficData = await routeResponse.json();
-
+        
         if (
           trafficData &&
           trafficData.routes &&
@@ -180,23 +181,21 @@ async function getTotalRouteTimeforMultipleRoutes(
           totalTravelTime += actualTravelTime;
         }
       }
+      console.log("Travel Time:"+totalTravelTime)
       pathArrays[i].totalTravelTime = totalTravelTime;
     } catch (error) {
       console.error("Error fetching data:", error);
       return null;
     }
-    let shortestPath;
-    pathArrays.forEach((route) => {
-      console.log(route.totalTravelTime)
-      const travelTime = route.totalTravelTime;
-      if (travelTime < shortestTravelTime) {
-        shortestPath=route;
-      }
-    });
-    console.log("hi")
-    console.log(shortestPath)
-    return shortestPath;
+    // pathArrays.forEach((route) => {
+    //   const travelTime = route.totalTravelTime;
+    //   if (travelTime < shortestTravelTime) {
+    //     shortestPath=route;
+    //   }
+    // });
   }
+ 
+    return pathArrays;
 }
 
 

@@ -5,20 +5,16 @@ const neo4j = require('neo4j-driver');
 const { getTotalRouteTimeforMultipleRoutes } =require('./modeOfTransportController.js')
 
 
-const calculateShortestPath = async (req, res) => {
+const calculateShortestPath = async (restaurantName, deliveryAddress) => {
   try {
-    const sourceAddress = req.body.sourceAddress;
-    const destAddress = req.body.destAddress;
-    console.log(sourceAddress)
-    console.log(destAddress)
     var session = neo4jClient.session({
       database: "neo4j",
       defaultAccessMode: neo4j.session.READ,
     });
 
     const routeQuery = `
-    MATCH (to:Address{full_address: $destAddress})-[:NEAREST_INTERSECTION]->(source:Intersection) 
-    MATCH (from:Restaurant{name: $sourceAddress})-[:NEAREST_INTERSECTION]->(target:Intersection) 
+    MATCH (to:Address{full_address: $deliveryAddress})-[:NEAREST_INTERSECTION]->(source:Intersection) 
+    MATCH (from:Restaurant{name: $restaurantName})-[:NEAREST_INTERSECTION]->(target:Intersection) 
     CALL gds.shortestPath.yens.stream('sanMateo',{sourceNode: source, targetNode: target, k: 3, relationshipWeightProperty: 'length'})
     YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path
     RETURN index, totalCost,
@@ -26,10 +22,9 @@ const calculateShortestPath = async (req, res) => {
     ORDER BY index`;
 
     let shortestPaths = []; 
-    let oneShortestPath;
 
     session
-      .run(routeQuery, { sourceAddress, destAddress })
+      .run(routeQuery, { restaurantName, deliveryAddress })
       .subscribe({
         onNext: records => {
           shortestPaths.push({"distance":records.get("totalCost"),"path":records.get("path")}); 
@@ -37,29 +32,28 @@ const calculateShortestPath = async (req, res) => {
         },
         onCompleted: async () => {
           session.close();
-          oneShortestPath=await getTotalRouteTimeforMultipleRoutes(shortestPaths, "motorcycle")
-          console.log(oneShortestPath)
-          res.status(201).json({
-            success: true,
-            data: oneShortestPath,
-            message: "Shortest Paths Calculated"
-          });
+          console.log("hi")
+          shortestPaths=await getTotalRouteTimeforMultipleRoutes(shortestPaths, "motorcycle")
+          // res.status(201).json({
+          //   success: true,
+          //   data: shortestPaths,
+          //   message: "Shortest Paths Calculated"
+          // });
+          return shortestPaths;
         },
         onError: error => {
           console.log(error);
           session.close();
-          res.status(500).json({
-            success: false,
-            message: error.message
-          });
+          return [];
         }
       });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    // res.status(500).json({
+    //   success: false,
+    //   message: error.message
+    // });
+    return [];
   }
 };
 

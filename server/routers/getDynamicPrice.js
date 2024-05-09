@@ -42,10 +42,12 @@ function calculateModeIncrement(mode) {
 }
 
 // Function to calculate total price
-function calculateTotalPrice(distance, weather, demand, mode) {
+function calculateTotalPrice(distance, customerName, customerId, mode) {
+  //redis weather key Buffer.from(customerName.toLowerCase().trim().replace(' ', '') + customerId).toString('base64')
+  //demand from db
   const distanceIncrement = calculateDistanceIncrement(distance);
-  const weatherIncrement = calculateWeatherIncrement(weather);
-  const demandIncrement = calculateDemandIncrement(demand);
+  const weatherIncrement = calculateWeatherIncrement("snowy");
+  const demandIncrement = 23;//calculateDemandIncrement(demand);
   const modeIncrement = calculateModeIncrement(mode);
 
   const totalPrice = baseFare + distanceIncrement + weatherIncrement + demandIncrement + modeIncrement;
@@ -71,4 +73,4 @@ router.get('/calculatePrice', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = { calculateTotalPrice };
