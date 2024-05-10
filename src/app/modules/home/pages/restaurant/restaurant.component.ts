@@ -12,9 +12,8 @@ export class RestaurantComponent {
   panelOpenState = false;
   restaurants: any;
   readyForPickup:boolean=false;
-  status: boolean = true;
+  status: string = 'confirmed';
   code: any = true;
-  isOutForDelivery: boolean = false
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
@@ -22,30 +21,27 @@ export class RestaurantComponent {
       .get<any[]>("http://localhost:3001/api/getRestaurants/orders")
       .subscribe((pendingOrders) => {
         this.customerList = pendingOrders;
-        console.log(this.customerList);
         this.createOrderCart();
       });
   }
 
   createOrderCart() {
-    console.log(this.customerList);
-
     this.customerList.forEach((customer: any) => {
       const states: boolean[] = [];
       customer.orderArray.forEach((item: any) => {
         states.push(false);
       });
       this.buttonStates.push(states);
-      console.log(this.buttonStates);
     });
   }
 
   callUpdateStatus(status: string, order: any) {
     if(status == 'Preparing Food') {
-      this.status = false;
+      this.status = status;
       this.updateStatus(order, status)
     }
     else {
+      this.status = status;
       this.updateStatus(order, status)
     }
   }
@@ -69,11 +65,10 @@ export class RestaurantComponent {
     this.http.post('http://localhost:3001/api/order/status/update', statusUpdateObj).subscribe(
       (res: any) => {
         if(res.message == 'Pickup code invalid')
-        console.log("Status updated " + status)
-        if(status==="Ready For Pickup")
-          {
-            this.readyForPickup=true;
-          }
+          console.log("Status updated " + status)
+        else if(status == 'Out For Delivery' && res.message == 'Order Status Updated!') {
+          this.status = 'Out For Delivery';
+        }
       },
       (error) => {
         console.error('Error updating order status:', error);
