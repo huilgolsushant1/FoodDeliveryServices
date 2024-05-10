@@ -183,7 +183,7 @@ const updateStatus = async (req, res) => {
                 await redisClient.set(redisKey, customerObj);
 
                 //rider status update
-                updateRiderStatus(riderId, "available");
+                updateRiderStatus(riderId, "available", );
 
                 //orders status update
                 const ordersCollection = db.collection("orders");
