@@ -30,6 +30,14 @@
           <h5>Delivery Code: </h5><p>{{orderDetails.deliveryCode}}</p>
         </div>  
       </div>
+      <div style="display: flex;">
+        <div style="width: 50%;">
+          <h5>Mode Of Transport: </h5><p>{{ orderDetails.rider.modeOfTransport }}</p>
+        </div>
+        <div>
+          <h5>Weather: </h5><p>{{orderDetails.weather}}</p>
+        </div>  
+      </div>
       <button (click)="updateStatus()">Refresh Status</button>
     </div>
   </div>

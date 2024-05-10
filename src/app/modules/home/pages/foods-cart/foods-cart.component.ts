@@ -25,7 +25,7 @@ export class FoodsCartComponent implements OnInit {
   ngOnInit(): void {
     this.ordersData = JSON.parse(sessionStorage.getItem('orderData') || '{}');
     console.log(this.ordersData);
-    this.cart = this.ordersData.data.orderDetails.orderedItems
+    this.cart = this.ordersData.data.orderDetails.orderedItems;
     this.cartTotal = this.ordersData.data.orderDetails.totalPrice;
     this.fetchRestaurants();
   }
@@ -63,6 +63,7 @@ export class FoodsCartComponent implements OnInit {
   }
 
   placeOrder() {
+    this.ordersData.data.orderDetails.totalPrice = this.cartTotal + this.ordersData.data.orderDetails.rider.deliveryCharge;
     this.neo4jService.placeOrder(this.ordersData).subscribe(res => {
       this.router.navigate(['/checkout'], { state: { res } });
     })

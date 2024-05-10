@@ -10,7 +10,7 @@ const getDriverLocation = async (restaurantName, vehicleType) => {
       database: "neo4j",
       defaultAccessMode: neo4j.session.READ,
     });
-
+    console.log('MOD', vehicleType)
     const routeQuery = `
         MATCH (to:Restaurant{name:$restaurantName})-[:NEAREST_INTERSECTION]->(destination:Intersection)
         WITH destination, to
@@ -26,6 +26,7 @@ const getDriverLocation = async (restaurantName, vehicleType) => {
         RETURN 
             s1.id AS riderId,
             s1.name AS riderName,
+            s1.vehicleType AS modeOfTransport,
             s1.location AS riderLocation, 
             to.address+", "+to.city+", "+to.zip AS restaurantAddress, 
             totalCost,
@@ -40,7 +41,8 @@ const getDriverLocation = async (restaurantName, vehicleType) => {
       riderLocation: record.get("riderLocation"),
       restaurantAddress: record.get("restaurantAddress"),
       totalCost: record.get("totalCost"),
-      path: record.get("path")
+      path: record.get("path"),
+      modeOfTransport: record.get("modeOfTransport")
     }));
 
     session.close();

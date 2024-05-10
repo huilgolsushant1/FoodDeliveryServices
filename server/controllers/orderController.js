@@ -25,7 +25,8 @@ const placeTheOrder = async (req, res) => {
         response.orderDetails.orderStatus = "confirmed";
         response.orderDetails.deliveryCode = Math.floor(1000 + Math.random() * 9000);
         response.orderDetails.rider.pickUpCode = Math.floor(1000 + Math.random() * 9000);
-        response.orderDetails.rider.modeOfTransport = reqObj.orderDetails.rider.modeOfTransport;
+        // response.orderDetails.rider.modeOfTransport = reqObj.orderDetails.rider.modeOfTransport;
+        console.log('Mode of Transport', reqObj.orderDetails.rider.modeOfTransport)
         //add it to mongo db
         const db = mongoClient.db("FoodDeliveryService");
         const ordersCollection = db.collection("orders");
