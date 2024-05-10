@@ -18,7 +18,7 @@
               <p class="info">Order Number: {{ items.orderId }}</p>
               <p>Ordered Items: {{ formatOrderItems(items.orderItems) }}</p>
               <p class="info">Total Price: {{ items.totalPrice }}</p>
-              <button
+              <!-- <button
                 class="btn"
                 (click)="onPreparingFoodClicked(i, j, items)"
                 [disabled]="buttonStates[i][j]"
@@ -27,8 +27,13 @@
                 *ngIf="!readyForPickup"
               >
                 {{ buttonStates[i][j] ? "Ready for pickup" : "Preparing food" }}
-              </button>
-              <h3 style="color: rgb(7, 64, 7);" *ngIf="readyForPickup">Ready For Pickup</h3>
+              </button> -->
+              <button *ngIf="status == 'confirmed'" class="btn" (click)="callUpdateStatus('Preparing Food', items)">Preparing Order</button>
+              <button *ngIf="status == 'Preparing Food'" class="btn" (click)="callUpdateStatus('Ready For Pickup', items)">Ready For Pickup</button>
+              <!-- <h3 style="color: rgb(10, 109, 10);" *ngIf="status == 'Ready For Pickup'">Ready For Pickup</h3> -->
+              <input *ngIf="status == 'Ready For Pickup'" style="width: 100px;" type="number" minlength="4" maxlength="4" [(ngModel)]="code"/>
+              <button *ngIf="status == 'Ready For Pickup'" style="width: 100px;" (click)="verifyCode(code, 'Out For Delivery', items)">Verify</button>
+              <h3 *ngIf="status == 'Out For Delivery'">Order Picked Up</h3>
             </div>
           </div>
         </mat-expansion-panel>
