@@ -39,14 +39,14 @@
         src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png"
         alt="Avatar"
       />
-      <h4>Top Restaurants</h4>
+      <h4>Nearby Restaurants</h4>
     </div>
     <div class="contentInnerCard">
       <table>
         <thead>
           <tr>
             <th>Name</th>
-            <th>Distance</th>
+            <th>Distance (kms)</th>
             <th>Rating</th>
           </tr>
         </thead>
@@ -72,7 +72,7 @@
         alt="Avatar"
       />
       <h4>Top Cuisines</h4>
-      <select (change)="onCuisineChange($event)">
+      <select class="custom-select" (change)="onCuisineChange($event)">
         <option
           [value]="cuisineItem.cuisine"
           *ngFor="let cuisineItem of topCuisines"
@@ -111,7 +111,7 @@
         src="https://static.vecteezy.com/system/resources/previews/024/341/917/original/top-5-3d-render-png.png"
         alt="Avatar"
       />
-      <h4>Top Budget Friendly</h4>
+      <h4>Budget Friendly Restaurants</h4>
     </div>
     <div class="contentInnerCard">
       <table>
@@ -119,7 +119,7 @@
           <tr>
             <th>Name</th>
             <th>Budget</th>
-            <th>Distance</th>
+            <th>Distance (kms)</th>
           </tr>
         </thead>
         <tbody>
