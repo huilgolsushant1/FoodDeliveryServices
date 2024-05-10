@@ -25,6 +25,8 @@ export class FoodsCartComponent implements OnInit {
   ngOnInit(): void {
     this.ordersData = JSON.parse(sessionStorage.getItem('orderData') || '{}');
     console.log(this.ordersData);
+    this.cart = this.ordersData.data.orderDetails.orderedItems
+    this.cartTotal = this.ordersData.data.orderDetails.totalPrice;
     this.fetchRestaurants();
   }
 
