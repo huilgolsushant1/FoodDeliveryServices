@@ -175,7 +175,7 @@ const updateStatus = async (req, res) => {
                 redisKey = Buffer.from(customerName.toLowerCase().trim().replace(' ', '') + customerId).toString('base64');
                 customerObj = JSON.parse(await redisClient.get(redisKey));
                 if (deliveryCode !== customerObj.deliveryCode) {
-                    return res.status(400).json({ message: "Delivery code invalid" })
+                    return res.status(200).json({ message: "Delivery code invalid" })
                 }
                 customerObj.orderDetails = {};
                 await redisClient.set(redisKey, customerObj);
@@ -202,7 +202,7 @@ const updateStatus = async (req, res) => {
                 {
 
                     if (pickupCode !== customerObj.rider.pickupCode) {
-                        return res.status(400).json({ message: "Pickup code invalid" })
+                        return res.status(200).json({ message: "Pickup code invalid" })
                     }
                     //else update status in redis
                 }
