@@ -20,12 +20,12 @@
         <tbody>
           <tr
             *ngFor="let restaurant of topInfluencer"
-            (click)="onRowClick(restaurant)"
+            (click)="onRowClick(restaurant.restaurantDetails.properties.id)"
             style="cursor: pointer"
             class="hover-effect"
           >
             <td>{{ restaurant.name }}</td>
-            <td>{{ restaurant.influencerVisits.low }}</td>
+            <td>{{ restaurant.influencerVisits }}</td>
             <td>{{ restaurant.avgRating }}</td>
           </tr>
         </tbody>
@@ -53,7 +53,7 @@
         <tbody>
           <tr
             *ngFor="let restaurant of topRestaurants"
-            (click)="onRowClick(restaurant)"
+            (click)="onRowClick(restaurant.restaurantId)"
             style="cursor: pointer"
             class="hover-effect"
           >
@@ -93,7 +93,7 @@
         <tbody>
           <tr
             *ngFor="let restaurant of topSelectedCuisine"
-            (click)="onRowClick(restaurant)"
+            (click)="onRowClick(restaurant.restaurantId)"
             style="cursor: pointer"
             class="hover-effect"
           >
@@ -125,12 +125,12 @@
         <tbody>
           <tr
             *ngFor="let restaurant of topBudgetFriendly"
-            (click)="onRowClick(restaurant)"
+            (click)="onRowClick(restaurant.restaurantId)"
             style="cursor: pointer"
             class="hover-effect"
           >
             <td>{{ restaurant.restaurant_name }}</td>
-            <td>{{ restaurant.avgCostForTwo.low }}</td>
+            <td>{{ restaurant.avgCostForTwo }}</td>
             <td>{{ restaurant.distanceToCustomerKms }}</td>
           </tr>
         </tbody>

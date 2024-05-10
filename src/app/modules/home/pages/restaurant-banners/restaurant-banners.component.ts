@@ -44,8 +44,8 @@ export class RestaurantBannersComponent implements OnInit {
     // );
   }
 
-  onRowClick(restaurant: any) {
-    this.router.navigate(["/details"], { state: { restaurant } });
+  onRowClick(restaurantId: number) {
+    this.router.navigate(["/details", restaurantId]);
   }
 
   onCuisineChange(selectedCuisine: any): void {

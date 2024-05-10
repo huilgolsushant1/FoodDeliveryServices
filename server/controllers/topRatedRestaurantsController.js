@@ -32,7 +32,7 @@ async function topRatedRestaurantsController(req, res) {
         "restaurant_name": record.get("restaurant.name"),
         "distanceInKms": record.get("distanceInKms"),
         "avgRating": record.get("avgRating"),
-        "restaurant_id": record.get("restaurant.id")
+        "restaurantId": record.get("restaurant.id")
       });
     });
 

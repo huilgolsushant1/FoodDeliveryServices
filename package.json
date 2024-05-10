@@ -32,6 +32,7 @@
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
     "moment": "^2.29.4",
+    "neo4j-driver": "^5.20.0",
     "ng-angular-popup": "^0.4.7",
     "ng-apexcharts": "^1.8.0",
     "number-to-words": "^1.2.4",

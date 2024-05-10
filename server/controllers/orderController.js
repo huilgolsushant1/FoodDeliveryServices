@@ -1,24 +1,29 @@
-const { calculateShortestPath } = require('./pathCalculationController.js')
-const { selectModeOfTransport } = require('./modeOfTransportController.js')
-const { redisClient, mongoClient, neo4jClient } = require('../database.js')
-const neo4j = require('neo4j-driver');
-const { calculateTotalPrice } = require('../routers/getDynamicPrice.js')
-const { getDriverLocation } = require('./allocateRider.js')
+const { calculateShortestPath } = require("./pathCalculationController.js");
+const {
+  selectModeOfTransport,
+  setOrder,
+} = require("./modeOfTransportController.js");
+const { redisClient, mongoClient, neo4jClient } = require("../database.js");
+const neo4j = require("neo4j-driver");
+const { calculateTotalPrice } = require("../routers/getDynamicPrice.js");
+const { getDriverLocation } = require("./allocateRider.js");
 const { ObjectId } = require('mongodb');
 
 const placeTheOrder = async (req, res) => {
-    try {
+  try {
+    let reqObj = req.body;
 
-        let reqObj = req.body;
+    //allocate rider to order
+    let response = reqObj;
+    response.orderDetails.rider = await getDriverLocation(
+      reqObj.orderDetails.restaurantName,
+      reqObj.orderDetails.rider.modeOfTransport
+    );
+    response.orderDetails.orderStatus = "confirmed";
 
-        //allocate rider to order
-        let response = reqObj;
-        response.orderDetails.rider = await getDriverLocation(reqObj.orderDetails.restaurantName, reqObj.orderDetails.rider.modeOfTransport)
-        response.orderDetails.orderStatus = 'confirmed';
-
-        //add it to mongo db 
-        const db = mongoClient.db("FoodDeliveryService");
-        const ordersCollection = db.collection("orders");
+    //add it to mongo db
+    const db = mongoClient.db("FoodDeliveryService");
+    const ordersCollection = db.collection("orders");
 
         const resultInsert = await ordersCollection.insertOne(reqObj.orderDetails);
         //update neo4j status
@@ -89,40 +94,65 @@ const updateRiderStatus = async (riderId, status) => {
 }
 
 const checkPrice = async (req, res) => {
-    try {
+  try {
+    let reqObj = req.body;
 
-        let reqObj = req.body;
+    let shortestPaths = await calculateShortestPath(
+      reqObj.restaurantName,
+      reqObj.deliveryAddress
+    );
 
-        let shortestPaths = await calculateShortestPath(reqObj.restaurantName, reqObj.deliveryAddress);
-        console.log(shortestPaths)
-        shortestPaths = Array(shortestPaths).sort((a, b) => a.travelTime - b.travelTime);
-        let modeOfTransport = "car";//calculateModeOfTransport(shortestPaths[0], reqObj.orderedItems)
-        let deliveryCharge = 2300; //calculateTotalPrice(shortestPaths[0].distance, reqObj.customerName, reqObj.customerId, modeOfTransport)
-        reqObj.rider = {
-            "modeOfTransport": modeOfTransport,
-            "deliveryCharge": deliveryCharge
-        };
-        let customerDetails = JSON.parse(await redisClient.get(Buffer.from(reqObj.customerName.toLowerCase().trim().replace(' ', '') + reqObj.customerId).toString('base64')));
-        let response = {
-            "shortestPaths": shortestPaths,
-            "weather": "sunny",
-            "orderDetails": reqObj
-        }
-        res.status(200).json({
-            success: true,
-            message: "Price calculated",
-            data: response
-        })
+    shortestPaths = Array(shortestPaths).sort(
+      (a, b) => a.travelTime - b.travelTime
+    );
 
-    }
-    catch (e) {
-        console.log(e)
-        res.status(500).json({
-            success: false,
-            message: e.message
-        })
-    }
-}
+    let modeOfTransport = await selectModeOfTransport(
+      shortestPaths[0][0],
+      reqObj.orderedItems,
+      reqObj.customerName,
+      reqObj.customerId
+    );
+    console.log(modeOfTransport); //calculateModeOfTransport(shortestPaths[0][0], reqObj.orderedItems)
+
+    let deliveryCharge = 2300; //calculateTotalPrice(shortestPaths[0].distance, reqObj.customerName, reqObj.customerId, modeOfTransport)
+    reqObj.rider = {
+      modeOfTransport: modeOfTransport,
+      deliveryCharge: deliveryCharge,
+    };
+    console.log(
+      Buffer.from(
+        reqObj.customerName.toLowerCase().trim().replace(" ", "") +
+          reqObj.customerId
+      ).toString("base64")
+    );
+    let customerDetails = JSON.parse(
+      await redisClient.get(
+        Buffer.from(
+          reqObj.customerName.toLowerCase().trim().replace(" ", "") +
+            reqObj.customerId
+        ).toString("base64")
+      )
+    );
+    let response = {
+      shortestPaths: shortestPaths,
+      weather: "sunny",
+      orderDetails: reqObj,
+    };
+    res.status(200).json({
+      success: true,
+      message: "Price calculated",
+      data: response,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: e.message,
+    });
+  }
+};
+
+module.exports = { placeTheOrder, checkPrice };
 
 const updateStatus = async (req, res) => {
 

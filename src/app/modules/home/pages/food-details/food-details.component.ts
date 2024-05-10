@@ -35,11 +35,8 @@ export class FoodDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.restaurant = history.state.restaurant;
     this.customerData = JSON.parse(sessionStorage.getItem('customer') || '{}');
-    console.log(this.customerData);
-    
-    this.restaurantId = this.restaurant.restaurantDetails.properties.id.low;
+    this.restaurantId = this.route.snapshot.paramMap.get('id');
     this.getReviews();
     this.getAdditionalDetails();
     this.getAverageCostForTwo();
@@ -77,6 +74,7 @@ export class FoodDetailsComponent implements OnInit {
   getAdditionalDetails() {
     this.neo4jService.getAdditionalDetails(this.restaurantId).subscribe(
       (data) => {
+        this.restaurant = data[0];
         this.dishes = data[0].dishes;
         this.dishes.forEach((dish: any) => {
           dish.quantity = 0;
@@ -92,7 +90,7 @@ export class FoodDetailsComponent implements OnInit {
   getAverageCostForTwo() {
     this.neo4jService.getAvgCostForTwo(this.restaurantId).subscribe(
       (data: any) => {
-        this.getAvgCostForTwo = data?.cost?.low;
+        this.getAvgCostForTwo = data?.cost;
       },
       (error) => {
         console.error("Error fetching data from Neo4j:", error);

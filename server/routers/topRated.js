@@ -5,11 +5,13 @@ const { getCuisineRestaurantsController } = require('../controllers/getCuisineRe
 
 const topRatedRouter = express.Router();
 
-// top rate budget friendly restaurants
+// top rated budget friendly restaurants
 topRatedRouter.get("/restaurants", topBudgetRestaurantsController);
-// topRatedRouter.get("/influenc", topRatedRestaurantsController);
 
+//Top rated nearby restaurants
 topRatedRouter.get('/top-rated-restaurants', topRatedRestaurantsController);
+
+//Top rated cuisine based restaurants
 topRatedRouter.get("/cuisineRestaurants", getCuisineRestaurantsController);
 
 

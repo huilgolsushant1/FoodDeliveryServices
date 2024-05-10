@@ -2,7 +2,14 @@ import { Component, EventEmitter, OnInit } from '@angular/core';
 import * as L from "leaflet";
 import { Icon, icon, Marker } from "leaflet";
 import 'leaflet-routing-machine';
-import { RidersService } from "../../../share/service/riders.service"
+import { RidersService } from "../../../share/service/riders.service";
+
+const customMarker = new L.Icon({
+  iconUrl: "https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [10, 41],
+  popupAnchor: [2, -40]
+});
 
 @Component({
   selector: 'app-checkout',
@@ -28,7 +35,7 @@ export class CheckoutComponent {
    ngOnInit() {
     const temp = history.state.res;
     this.orderDetails = temp.data.orderDetails;
-    this.shortestPath = temp.data.shortestPaths
+    this.shortestPath = temp.data.shortestPaths[0][0];
     
     Marker.prototype.options.icon = this.defaultIcon;
 
@@ -76,7 +83,6 @@ export class CheckoutComponent {
   calculateRouteAndPrice() {
     if (this.selected && this.restaurant) {
       this.ridersService.getRoute(this.restaurant, this.selected).subscribe((result: any) => {
-        console.log(result);
         if (result?.success && result?.data && result?.data) {
           this.restaurantToDest = result?.data[0].path;
           // L.Routing.control({
@@ -88,14 +94,12 @@ export class CheckoutComponent {
           .setStyle({ color: "red", weight: 7 })
           .addTo(this.map);
 
-          console.log(this.restaurantToDest[0])
-          console.log(this.restaurantToDest[this.restaurantToDest.length-1])
-
           var corner1 = L.latLng(this.restaurantToDest[0][0], this.restaurantToDest[0][1]),
           corner2 = L.latLng(this.restaurantToDest[this.restaurantToDest.length-1][0], this.restaurantToDest[this.restaurantToDest.length-1][1])
           
            L.marker(corner1).addTo(this.map);
            L.marker(corner2).addTo(this.map);
+
           
           let bounds = L.latLngBounds(corner1, corner2);
           this.map.panInsideBounds(bounds)
@@ -105,6 +109,31 @@ export class CheckoutComponent {
       })
 
     }
+  }
+
+  startRouting() {
+    let startPoint = this.shortestPath.path[0];
+    let endPoint = this.shortestPath.path[this.shortestPath.path.length - 1];    
+    
+    var polyline = L.polyline(this.shortestPath.path)
+          .setStyle({ color: "red", weight: 7 })
+          .addTo(this.map);
+
+          var corner1 = L.latLng(startPoint[0], startPoint[1]),
+          corner2 = L.latLng(endPoint[0], endPoint[1])
+          
+           L.marker(corner1).addTo(this.map);
+           L.marker(corner2).addTo(this.map);
+           var marker = L.marker(corner1).addTo(this.map);
+          
+          let bounds = L.latLngBounds(corner1, corner2);
+          this.map.panInsideBounds(bounds)
+
+          this.shortestPath.path.forEach(function (coord:any, index:any) {
+            setTimeout(function () {
+            marker.setLatLng([coord[0], coord[1]]);
+          }, 1000 * index)
+        })
   }
 
 
