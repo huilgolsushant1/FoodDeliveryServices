@@ -28,12 +28,12 @@
               >
                 {{ buttonStates[i][j] ? "Ready for pickup" : "Preparing food" }}
               </button> -->
-              <button *ngIf="status && !readyForPickup" class="btn" (click)="callUpdateStatus('Preparing Food', items)">Preparing Order</button>
-              <button *ngIf="!status && !readyForPickup" class="btn" (click)="callUpdateStatus('Ready For Pickup', items)">Ready For Pickup</button>
-              <h3 style="color: rgb(10, 109, 10);" *ngIf="readyForPickup">Ready For Pickup</h3>
-              <input *ngIf="readyForPickup" style="width: 100px;" type="number" minlength="4" maxlength="4" [(ngModel)]="code"/>
-              <button *ngIf="readyForPickup" style="width: 100px;" (click)="verifyCode(code, 'Out For Delivery', items)">Verify</button>
-              <h3 *ngIf="isOutForDelivery">Order Picked Up</h3>
+              <button *ngIf="status == 'confirmed'" class="btn" (click)="callUpdateStatus('Preparing Food', items)">Preparing Order</button>
+              <button *ngIf="status == 'Preparing Food'" class="btn" (click)="callUpdateStatus('Ready For Pickup', items)">Ready For Pickup</button>
+              <!-- <h3 style="color: rgb(10, 109, 10);" *ngIf="status == 'Ready For Pickup'">Ready For Pickup</h3> -->
+              <input *ngIf="status == 'Ready For Pickup'" style="width: 100px;" type="number" minlength="4" maxlength="4" [(ngModel)]="code"/>
+              <button *ngIf="status == 'Ready For Pickup'" style="width: 100px;" (click)="verifyCode(code, 'Out For Delivery', items)">Verify</button>
+              <h3 *ngIf="status == 'Out For Delivery'">Order Picked Up</h3>
             </div>
           </div>
         </mat-expansion-panel>
