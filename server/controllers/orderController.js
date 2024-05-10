@@ -126,7 +126,7 @@ const checkPrice = async (req, res) => {
         ).toString("base64");
         
         console.log(modeAndWeather.orderDetails.weather)
-        const distance = 4500;//calculateModeOfTransport(shortestPaths[0], reqObj.orderedItems)
+        const distance = shortestPaths[0][0].distance;
         const weather = modeAndWeather.orderDetails.weather;
         const mode = modeAndWeather.orderDetails.rider.modeOfTransport;
     
@@ -206,7 +206,7 @@ const updateStatus = async (req, res) => {
                 await redisClient.set(redisKey, customerObj);
 
                 //rider status update
-                updateRiderStatus(riderId, "available");
+                updateRiderStatus(riderId, "available", );
 
                 //orders status update
                 const ordersCollection = db.collection("orders");
