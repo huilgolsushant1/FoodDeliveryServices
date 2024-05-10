@@ -169,7 +169,7 @@ const updateStatus = async (req, res) => {
         customerId = req.body.customerId;
         orderStatus = req.body.orderStatus;
         deliveryCode = req.body.deliveryCode;
-        pickupCode = req.body.pickupCode
+        pickupCode = req.body.pickUpCode
         riderId = req.body.riderId;
         if (orderId && customerName && customerId && orderStatus) {
             //if status is delivered remove order related data and update in mongo riders and neo4j
@@ -202,8 +202,9 @@ const updateStatus = async (req, res) => {
                 
                 if(orderStatus.toLowerCase()==="out for delivery")
                 {
-
-                    if (pickupCode !== customerObj.rider.pickupCode) {
+                    console.log('Code', customerObj.orderDetails.rider.pickUpCode)
+                    console.log('Temp Code', req.body)
+                    if (pickupCode !== parseInt(customerObj.orderDetails.rider.pickUpCode)) {
                         return res.status(200).json({ message: "Pickup code invalid" })
                     }
                     //else update status in redis
