@@ -71,7 +71,6 @@ const updateRiderStatus = async (riderId, status) => {
         `;
         //const riderId = riderId;
         const result = await session.run(routeQuery, { riderId, status });
-        console.log('Rider Updated Status in neo4j', riderId);
 
         //update rider status  mongo
         const db = mongoClient.db("FoodDeliveryService");
