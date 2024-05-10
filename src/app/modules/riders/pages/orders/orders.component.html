@@ -29,8 +29,12 @@
 
       </div>
     </div>
+    <p>Pick up code: {{ orderDetails.rider.pickUpCode }}</p>
+
     <p>Order Status: {{ orderDetails.orderStatus | textTransform }}</p>
-    <button (click)="updateStatus()" *ngIf="statusToBeUpdated" >{{ statusToBeUpdated }}</button>
+    <input *ngIf="isOutForDelivery" style="width: 100px;" type="number" minlength="4" maxlength="4" [(ngModel)]="code"/>
+    <button *ngIf="isOutForDelivery" style="width: 100px;" (click)="updateStatus()">Verify & Deliver</button>
+
   </div>
 </div>
 

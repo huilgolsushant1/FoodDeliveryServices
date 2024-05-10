@@ -23,28 +23,11 @@ export class OrdersComponent implements OnInit {
 
 
   constructor(private http: HttpClient, private ridersService: RidersService, private route: ActivatedRoute) {
-    //   this.orderDetails={
-    //     "restaurantName":"Paakashala",
-    //     "restaurantAddress":"201 S DELAWARE AVE # B, SAN MATEO, 94401",
-    //     "orderId":"#1234",
-    //     "orderItems":[{
-    //       "dish":"Waffles",
-    //       "price":"123",
-    //       "quantity":2
-    //     },
-    //     {
-    //       "dish":"Waffles",
-    //       "price":"123",
-    //       "quantity":2
-    //     }],
-    //     "orderStatus":"readyForPickup"
-    //   }
-    //  }
+
   }
 
   orderDetails: any;
   shortestPath:any;
-  statusToBeUpdated: string = "";
   map: any;
 
   items: string[] = [];
@@ -52,10 +35,11 @@ export class OrdersComponent implements OnInit {
 
   filteredItems: string[] = [];
   showDropdown: boolean = false;
-  restaurant: string = "NUTRICION CELLULAR"
+  restaurant: string = "";
   restaurantToDest: any;
   riderId: number = 0;
-
+  isOutForDelivery:boolean=false;
+  code: any = true;
 
 
   ngOnInit() {
@@ -67,6 +51,10 @@ export class OrdersComponent implements OnInit {
       (data:any) => {
         this.orderDetails = data?.orderDetails;
         this.shortestPath = data?.shortestPaths[0][0];
+        if(this.orderDetails?.orderStatus === "Out For Delivery"){
+          this.isOutForDelivery=true;
+          this.startRouting()
+        }
       },
       (error) => {
         console.error('Error fetching orders:', error);
@@ -82,20 +70,8 @@ export class OrdersComponent implements OnInit {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
 
-    // L.Routing.control({
-    //   waypoints: [L.latLng(57.74, 11.94), L.latLng(57.6792, 11.949)],
-    //   routeWhileDragging: true
-    // }).addTo(this.map);
-    this.statusToBeUpdated = "Out For Delivery"
 
-    if (this.orderDetails?.orderStatus === "Ready For Pickup") {
-      console.log("this.orderDetails?.orderStatus")
-      this.statusToBeUpdated = "Out For Delivery"
-    }
-    else if (this.orderDetails?.orderStatus === "Out For Delivery") {
-      this.statusToBeUpdated = "Delivered"
-    }
-
+ 
   }
   onInput(event: any) {
 
@@ -125,39 +101,7 @@ export class OrdersComponent implements OnInit {
     iconUrl: "https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png"
   });
 
-  calculateRouteAndPrice() {
-    if (this.selected && this.restaurant) {
-      this.ridersService.getRoute(this.restaurant, this.selected).subscribe((result: any) => {
-        console.log(result);
-        if (result?.success && result?.data && result?.data) {
-          this.restaurantToDest = result?.data[0].path;
-          // L.Routing.control({
-          //   waypoints: this.restaurantToDest,
-          //   routeWhileDragging: true
-          // }).addTo(this.map);
-
-          var polyline = L.polyline(this.restaurantToDest)
-            .setStyle({ color: "red", weight: 7 })
-            .addTo(this.map);
-
-          console.log(this.restaurantToDest[0])
-          console.log(this.restaurantToDest[this.restaurantToDest.length - 1])
-
-          var corner1 = L.latLng(this.restaurantToDest[0][0], this.restaurantToDest[0][1]),
-            corner2 = L.latLng(this.restaurantToDest[this.restaurantToDest.length - 1][0], this.restaurantToDest[this.restaurantToDest.length - 1][1])
-
-          L.marker(corner1).addTo(this.map);
-          L.marker(corner2).addTo(this.map);
-
-          let bounds = L.latLngBounds(corner1, corner2);
-          this.map.panInsideBounds(bounds)
-          // L.polyline(this.restaurantToDest, { color: 'blue' }).addTo(this.map);
-
-        }
-      })
-
-    }
-  }
+ 
   startRouting() {
     let startPoint = this.shortestPath.path[0];
     let endPoint = this.shortestPath.path[this.shortestPath.path.length - 1];    
@@ -220,16 +164,14 @@ export class OrdersComponent implements OnInit {
       "orderId": this.orderDetails.orderId,
       "customerName": this.orderDetails.customerName,
       "customerId": this.orderDetails.customerId,
-      "orderStatus": this.statusToBeUpdated,
+      "orderStatus": "Delivered",
       "riderId": this.orderDetails.rider.riderId,
-      "deliveryCode": null
+      "deliveryCode": this.code
     }
-    if (this.statusToBeUpdated.toLowerCase() == "delivered") {
       statusUpdateObj.deliveryCode = this.orderDetails.deliveryCode;
 
       this.http.post('http://localhost:3001/api/order/status/update', statusUpdateObj).subscribe(
         (data) => {
-          this.statusToBeUpdated = "";
           this.orderDetails.orderStatus="Delivered";
         },
         (error) => {
@@ -237,23 +179,8 @@ export class OrdersComponent implements OnInit {
         }
       );
     }
-    else
-    {
-  
-       this.startRouting()
-        this.http.post('http://localhost:3001/api/status/update', statusUpdateObj).subscribe(
-          (data) => {
-            this.statusToBeUpdated = "Delivered";
-            this.orderDetails.orderStatus="Out For Delivery";
-          },
-          (error) => {
-            console.error('Error updating order status:', error);
-          }
-        );
-      
-    }
-
 
   }
+  
 
-}
+

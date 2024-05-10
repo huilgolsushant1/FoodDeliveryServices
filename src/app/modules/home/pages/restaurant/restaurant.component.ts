@@ -12,6 +12,9 @@ export class RestaurantComponent {
   panelOpenState = false;
   restaurants: any;
   readyForPickup:boolean=false;
+  status: boolean = true;
+  code: any = true;
+  isOutForDelivery: boolean = false
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
@@ -37,32 +40,35 @@ export class RestaurantComponent {
     });
   }
 
-  onPreparingFoodClicked(restaurantIndex: number, orderIndex: number, order: any) {
-    const statusBool = this.buttonStates[restaurantIndex][orderIndex];
-    if (statusBool) {
-      this.updateStatus(order, "Preparing Food")
-      
-      this.buttonStates[restaurantIndex][orderIndex] =
-        !this.buttonStates[restaurantIndex][orderIndex];
-      
+  callUpdateStatus(status: string, order: any) {
+    if(status == 'Preparing Food') {
+      this.status = false;
+      this.updateStatus(order, status)
     }
     else {
-      this.updateStatus(order, "Ready For Pickup")
+      this.updateStatus(order, status)
     }
-
-
   }
 
-  updateStatus(order: any, status: string) {
+  verifyCode(code:any, status: string, order: any) {
+    this.updateStatus(order, status, code)
+  }
 
-    let statusUpdateObj = {
+  updateStatus(order: any, status: string, code?: any) {
+
+    let statusUpdateObj:any = {
       "orderId": order.orderId,
       "customerName": order.customerName,
       "customerId": order.customerId,
       "orderStatus": status,
     }
+
+    if(code) {
+      statusUpdateObj.pickUpCode = code
+    }
     this.http.post('http://localhost:3001/api/order/status/update', statusUpdateObj).subscribe(
-      (data) => {
+      (res: any) => {
+        if(res.message == 'Pickup code invalid')
         console.log("Status updated " + status)
         if(status==="Ready For Pickup")
           {
