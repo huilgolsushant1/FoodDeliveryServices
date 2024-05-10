@@ -22,7 +22,14 @@
               <p>{{ orderDetails.totalPrice }}</p>
           </div>
       </div>
-      <h5>Order Status: </h5><p>{{ orderDetails.orderStatus }}</p>
-      <button (click)="startRouting()">Out For Delivery</button>
+      <div style="display: flex;">
+        <div style="width: 50%;">
+          <h5>Order Status: </h5><p>{{ orderDetails.orderStatus }}</p>
+        </div>
+        <div>
+          <h5>Delivery Code: </h5><p>{{orderDetails.deliveryCode}}</p>
+        </div>  
+      </div>
+      <button (click)="updateStatus()">Refresh Status</button>
     </div>
   </div>
