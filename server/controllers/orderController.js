@@ -203,7 +203,7 @@ const updateStatus = async (req, res) => {
                 if(orderStatus.toLowerCase()==="out for delivery")
                 {
 
-                    if (pickupCode !== customerObj.rider.pickupCode) {
+                    if (pickupCode !== customerObj.orderDetails.rider.pickUpCode) {
                         return res.status(200).json({ message: "Pickup code invalid" })
                     }
                     //else update status in redis
