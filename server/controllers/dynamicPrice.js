@@ -1,4 +1,4 @@
-const { mongoClient } = require('../database');
+const { mongoClient, redisClient } = require('../database');
 
 const baseFare = 20; 
 
@@ -28,15 +28,15 @@ async function calculateDemandIncrement(mode) {
 
     const pendingOrdersCount = await ordersCollection.countDocuments({
       orderStatus: 'Pending',
-      "rider.modeOfTransport": { "$regex": mode, "$options": "i" }
+      "rider.modeOfTransport": { "$regex": mode.toString(), "$options": "i" }
     });
 
     const availableRidersCount = await ridersCollection.countDocuments({
       status: { $ne: 'offline' },
-      vehicleType: { "$regex": mode, "$options": "i" }
+      vehicleType: { "$regex": mode.toString(), "$options": "i" }
     });
 
-    const demand = pendingOrdersCount / 1;
+    const demand = pendingOrdersCount / availableRidersCount;
     if (demand > 2) {
       return baseFare * demandFactor;
     }
@@ -65,6 +65,20 @@ function calculateModeIncrement(mode) {
   return baseFare * modeFactor;
 }
 
+
+// async function setOrder(code, newData) {
+//   try {
+//     let orderData = await redisClient.get(String(code));
+//     let data = JSON.parse(orderData);
+//     console.log(data);
+//     return "Order successfully set!";
+//   } catch (error) {
+//     console.error("Error setting order in Redis:", error);
+//     throw error;
+//   }
+// }
+
+
 // Function to calculate total price
 async function calculateTotalPrice(distance, weather, mode) {
   //redis weather key Buffer.from(customerName.toLowerCase().trim().replace(' ', '') + customerId).toString('base64')
@@ -80,4 +94,5 @@ async function calculateTotalPrice(distance, weather, mode) {
   return totalPrice;
 }
 
+// module.exports = setOrder;
 module.exports = calculateTotalPrice;

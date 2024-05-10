@@ -6,7 +6,6 @@ const getRestaurantsRouter = require("./routers/getRestaurants.js");
 const bodyParser = require("body-parser");
 const topRatedRouter = require("./routers/topRated.js");
 const getWeatherRouter = require("./routers/getWeather.js");
-const getDynamicPriceRouter = require("./routers/getDynamicPrice.js");
 const orderRouter = require("./routers/orderRouter.js");
 const riderRouter = require("./routers/riderRouter.js");
 const { mongoClient, redisClient, connectRedisDB } = require('./database.js');
