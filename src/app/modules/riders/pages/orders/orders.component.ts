@@ -22,28 +22,28 @@ const customMarker = new L.Icon({
 export class OrdersComponent implements OnInit {
 
 
-  constructor(private http: HttpClient, private ridersService: RidersService,private route: ActivatedRoute) {
-  //   this.orderDetails={
-  //     "restaurantName":"Paakashala",
-  //     "restaurantAddress":"201 S DELAWARE AVE # B, SAN MATEO, 94401",
-  //     "orderId":"#1234",
-  //     "orderItems":[{
-  //       "dish":"Waffles",
-  //       "price":"123",
-  //       "quantity":2
-  //     },
-  //     {
-  //       "dish":"Waffles",
-  //       "price":"123",
-  //       "quantity":2
-  //     }],
-  //     "orderStatus":"readyForPickup"
-  //   }
-  //  }
+  constructor(private http: HttpClient, private ridersService: RidersService, private route: ActivatedRoute) {
+    //   this.orderDetails={
+    //     "restaurantName":"Paakashala",
+    //     "restaurantAddress":"201 S DELAWARE AVE # B, SAN MATEO, 94401",
+    //     "orderId":"#1234",
+    //     "orderItems":[{
+    //       "dish":"Waffles",
+    //       "price":"123",
+    //       "quantity":2
+    //     },
+    //     {
+    //       "dish":"Waffles",
+    //       "price":"123",
+    //       "quantity":2
+    //     }],
+    //     "orderStatus":"readyForPickup"
+    //   }
+    //  }
   }
 
-  orderDetails:any;
-  statusToBeUpdated:string="";
+  orderDetails: any;
+  statusToBeUpdated: string = "";
   map: any;
 
   items: string[] = [];
@@ -53,7 +53,7 @@ export class OrdersComponent implements OnInit {
   showDropdown: boolean = false;
   restaurant: string = "NUTRICION CELLULAR"
   restaurantToDest: any;
-  riderId:number=0;
+  riderId: number = 0;
 
 
 
@@ -70,7 +70,7 @@ export class OrdersComponent implements OnInit {
         console.error('Error fetching orders:', error);
       }
     );
-    
+
     Marker.prototype.options.icon = this.defaultIcon;
 
     this.map = L.map("map").setView([37.563434, -122.322255], 13);
@@ -84,16 +84,14 @@ export class OrdersComponent implements OnInit {
     //   waypoints: [L.latLng(57.74, 11.94), L.latLng(57.6792, 11.949)],
     //   routeWhileDragging: true
     // }).addTo(this.map);
-    if(this.orderDetails?.orderStatus==="readyForPickup")
-      {
-        console.log("this.orderDetails?.orderStatus")
-        this.statusToBeUpdated="Out For Delivery"
-      }
-      else if(this.orderDetails?.orderStatus==="Out For Delivery")
-      {
-        this.statusToBeUpdated="Delivered"
-      }
-      
+    if (this.orderDetails?.orderStatus === "Ready For Pickup") {
+      console.log("this.orderDetails?.orderStatus")
+      this.statusToBeUpdated = "Out For Delivery"
+    }
+    else if (this.orderDetails?.orderStatus === "Out For Delivery") {
+      this.statusToBeUpdated = "Delivered"
+    }
+
   }
   onInput(event: any) {
 
@@ -135,21 +133,21 @@ export class OrdersComponent implements OnInit {
           // }).addTo(this.map);
 
           var polyline = L.polyline(this.restaurantToDest)
-          .setStyle({ color: "red", weight: 7 })
-          .addTo(this.map);
+            .setStyle({ color: "red", weight: 7 })
+            .addTo(this.map);
 
           console.log(this.restaurantToDest[0])
-          console.log(this.restaurantToDest[this.restaurantToDest.length-1])
+          console.log(this.restaurantToDest[this.restaurantToDest.length - 1])
 
           var corner1 = L.latLng(this.restaurantToDest[0][0], this.restaurantToDest[0][1]),
-          corner2 = L.latLng(this.restaurantToDest[this.restaurantToDest.length-1][0], this.restaurantToDest[this.restaurantToDest.length-1][1])
-          
-           L.marker(corner1).addTo(this.map);
-           L.marker(corner2).addTo(this.map);
-          
+            corner2 = L.latLng(this.restaurantToDest[this.restaurantToDest.length - 1][0], this.restaurantToDest[this.restaurantToDest.length - 1][1])
+
+          L.marker(corner1).addTo(this.map);
+          L.marker(corner2).addTo(this.map);
+
           let bounds = L.latLngBounds(corner1, corner2);
           this.map.panInsideBounds(bounds)
-         // L.polyline(this.restaurantToDest, { color: 'blue' }).addTo(this.map);
+          // L.polyline(this.restaurantToDest, { color: 'blue' }).addTo(this.map);
 
         }
       })
@@ -158,8 +156,44 @@ export class OrdersComponent implements OnInit {
   }
 
 
-  updateStatus()
-  {
+  updateStatus() {
+
+    let statusUpdateObj = {
+      "orderId": this.orderDetails.orderId,
+      "customerName": this.orderDetails.customerName,
+      "customerId": this.orderDetails.customerId,
+      "orderStatus": this.statusToBeUpdated,
+      "riderId": this.orderDetails.rider.riderId,
+      "deliveryCode": null
+    }
+    if (this.statusToBeUpdated.toLowerCase() == "delivered") {
+      statusUpdateObj.deliveryCode = this.orderDetails.deliveryCode;
+
+      this.http.post('http://localhost:3001/api/order/status/update', statusUpdateObj).subscribe(
+        (data) => {
+          this.statusToBeUpdated = "";
+          this.orderDetails.orderStatus="Delivered";
+        },
+        (error) => {
+          console.error('Error updating order status:', error);
+        }
+      );
+    }
+    else
+    {
+  
+        this.http.post('http://localhost:3001/api/status/update', statusUpdateObj).subscribe(
+          (data) => {
+            this.statusToBeUpdated = "Delivered";
+            this.orderDetails.orderStatus="Out For Delivery";
+          },
+          (error) => {
+            console.error('Error updating order status:', error);
+          }
+        );
+      
+    }
+
 
   }
 

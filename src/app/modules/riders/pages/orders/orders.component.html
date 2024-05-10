@@ -22,7 +22,7 @@
         </div>
     </div>
     <p>Order Status: {{ orderDetails.orderStatus | textTransform }}</p>
-    <button (click)="updateStatus()" *ngIf="statusToBeUpdated">{{ statusToBeUpdated }}</button>
+    <button (click)="updateStatus()" *ngIf="statusToBeUpdated" >{{ statusToBeUpdated }}</button>
   </div>
 </div>
 

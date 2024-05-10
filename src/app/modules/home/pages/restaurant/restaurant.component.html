@@ -20,13 +20,15 @@
               <p class="info">Total Price: {{ items.totalPrice }}</p>
               <button
                 class="btn"
-                (click)="onPreparingFoodClicked(i, j)"
+                (click)="onPreparingFoodClicked(i, j, items)"
                 [disabled]="buttonStates[i][j]"
                 [class.green]="!buttonStates[i][j]"
                 [class.blue]="buttonStates[i][j]"
+                *ngIf="!readyForPickup"
               >
                 {{ buttonStates[i][j] ? "Ready for pickup" : "Preparing food" }}
               </button>
+              <h3 style="color: rgb(7, 64, 7);" *ngIf="readyForPickup">Ready For Pickup</h3>
             </div>
           </div>
         </mat-expansion-panel>

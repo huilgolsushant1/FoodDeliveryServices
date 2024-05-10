@@ -35,9 +35,10 @@ router.get("/orders", async (req, res) => {
           order.orderStatus === "confirmed"
         ) {
           let orderCart = {
-            orderId: order.orderId,
+            orderId: order._id,
             orderItems: order.orderedItems,
             customerName: order.customerName,
+            customerId: order.customerId,
             totalPrice: order.totalPrice,
             orderStatus: order.orderStatus,
           };
