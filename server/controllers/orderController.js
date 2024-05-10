@@ -5,7 +5,9 @@ const {
 } = require("./modeOfTransportController.js");
 const { redisClient, mongoClient, neo4jClient } = require("../database.js");
 const neo4j = require("neo4j-driver");
-const { calculateTotalPrice } = require("../routers/getDynamicPrice.js");
+const calculateTotalPrice = require('./dynamicPrice');
+const weatherInfo = require('./weatherinfo');
+const updateDeliveryCharge = require('./weatherinfo');
 const { getDriverLocation } = require("./allocateRider.js");
 const { ObjectId } = require('mongodb');
 
@@ -23,6 +25,7 @@ const placeTheOrder = async (req, res) => {
         response.orderDetails.orderStatus = "confirmed";
         response.orderDetails.deliveryCode = Math.floor(1000 + Math.random() * 9000);
         response.orderDetails.rider.pickUpCode = Math.floor(1000 + Math.random() * 9000);
+        response.orderDetails.rider.modeOfTransport = reqObj.orderDetails.rider.modeOfTransport;
         //add it to mongo db
         const db = mongoClient.db("FoodDeliveryService");
         const ordersCollection = db.collection("orders");
@@ -115,12 +118,31 @@ const checkPrice = async (req, res) => {
             reqObj.customerId
         );
         console.log(modeAndWeather);
-
-        let deliveryCharge = 2300; //calculateTotalPrice(shortestPaths[0].distance, reqObj.customerName, reqObj.customerId, modeOfTransport)
-        // reqObj.rider = {
-        //   modeOfTransport: modeOfTransport,
-        //   deliveryCharge: deliveryCharge,
-        // };
+        let customerName = reqObj.customerName;
+        let customerId = reqObj.customerId;
+        let code = Buffer.from(
+        customerName.toLowerCase().trim().replace(" ", "") + customerId
+        ).toString("base64");
+        
+        console.log(modeAndWeather.orderDetails.weather)
+        const distance = 4500;//calculateModeOfTransport(shortestPaths[0], reqObj.orderedItems)
+        const weather = modeAndWeather.orderDetails.weather;
+        const mode = modeAndWeather.orderDetails.rider.modeOfTransport;
+    
+        // Call the calculateTotalPrice function with the provided parameters
+        let deliveryCharge = await calculateTotalPrice(distance, weather, mode);
+        // .then(totalPrice => {
+        //     console.log("Total Price:", totalPrice);
+        // })
+        // .catch(error => {
+        //     console.error("Error calculating total price:", error);
+        // });
+        
+        console.log("delivery", deliveryCharge);
+        
+        const dc = await updateDeliveryCharge(code, deliveryCharge);
+        // console.log(dc);
+    
         console.log(
             Buffer.from(
                 reqObj.customerName.toLowerCase().trim().replace(" ", "") +
