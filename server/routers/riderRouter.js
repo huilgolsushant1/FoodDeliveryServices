@@ -1,6 +1,6 @@
 const express = require('express');
 const { getDriverLocation } = require('../controllers/allocateRider');
-const { mongoClient } = require('../database.js');
+const { mongoClient, redisClient } = require('../database.js');
 
 const router = express.Router();
 router.get("/", async (req, res) => {
@@ -26,7 +26,13 @@ router.get("/order", async (req, res) => {
                 orderStatus: "confirmed"
             }).toArray();
             console.log(orders)
-            res.json(orders);
+            orderDetails=await redisClient.get(
+                Buffer.from(
+                  orders?.[0]?.customerName.toLowerCase().trim().replace(" ", "") +
+                  orders?.[0]?.customerId
+                ).toString("base64")
+              )
+            res.status(200).json(JSON.parse(orderDetails));
         } else {
             res.status(400).json({ error: 'Rider ID not provided or invalid' });
         }

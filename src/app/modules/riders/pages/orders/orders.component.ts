@@ -43,6 +43,7 @@ export class OrdersComponent implements OnInit {
   }
 
   orderDetails: any;
+  shortestPath:any;
   statusToBeUpdated: string = "";
   map: any;
 
@@ -63,8 +64,9 @@ export class OrdersComponent implements OnInit {
       this.riderId = params['id']; // Retrieve route parameter
     });
     this.http.get<any[]>(`http://localhost:3001/api/riders/order?riderId=${this.riderId}`).subscribe(
-      (data) => {
-        this.orderDetails = data?.[0];
+      (data:any) => {
+        this.orderDetails = data?.orderDetails;
+        this.shortestPath = data?.shortestPaths[0][0];
       },
       (error) => {
         console.error('Error fetching orders:', error);
@@ -84,6 +86,8 @@ export class OrdersComponent implements OnInit {
     //   waypoints: [L.latLng(57.74, 11.94), L.latLng(57.6792, 11.949)],
     //   routeWhileDragging: true
     // }).addTo(this.map);
+    this.statusToBeUpdated = "Out For Delivery"
+
     if (this.orderDetails?.orderStatus === "Ready For Pickup") {
       console.log("this.orderDetails?.orderStatus")
       this.statusToBeUpdated = "Out For Delivery"
@@ -154,6 +158,60 @@ export class OrdersComponent implements OnInit {
 
     }
   }
+  startRouting() {
+    let startPoint = this.shortestPath.path[0];
+    let endPoint = this.shortestPath.path[this.shortestPath.path.length - 1];    
+    
+    var polyline = L.polyline(this.shortestPath.path)
+          .setStyle({ color: "red", weight: 7 })
+          .addTo(this.map);
+
+          const restaurant = L.icon({
+            iconUrl: 'assets/restaurant.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+
+          const customer = L.icon({
+            iconUrl: 'assets/customer.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+      
+          const bicycle = L.icon({
+            iconUrl: 'assets/bicycle.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+      
+          const bike = L.icon({
+            iconUrl: 'assets/bike.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+      
+          const car = L.icon({
+            iconUrl: 'assets/car.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+
+          var corner1 = L.latLng(startPoint[0], startPoint[1]),
+          corner2 = L.latLng(endPoint[0], endPoint[1])
+          
+           L.marker(corner1, { icon: restaurant }).addTo(this.map);
+           L.marker(corner2, { icon: customer }).addTo(this.map);
+           var marker = L.marker(corner1, { icon: bike }).addTo(this.map);
+          
+          let bounds = L.latLngBounds(corner1, corner2);
+          this.map.panInsideBounds(bounds)
+
+          this.shortestPath.path.forEach(function (coord:any, index:any) {
+            setTimeout(function () {
+            marker.setLatLng([coord[0], coord[1]]);
+          }, 1000 * index)
+        })
+  }
 
 
   updateStatus() {
@@ -182,6 +240,7 @@ export class OrdersComponent implements OnInit {
     else
     {
   
+       this.startRouting()
         this.http.post('http://localhost:3001/api/status/update', statusUpdateObj).subscribe(
           (data) => {
             this.statusToBeUpdated = "Delivered";
