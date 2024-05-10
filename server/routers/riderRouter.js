@@ -22,7 +22,7 @@ router.get("/order", async (req, res) => {
             const db = mongoClient.db("FoodDeliveryService");
             const collection = db.collection("orders");
             const orders = await collection.find({
-                "rider.riderId.low": riderId, // Using dot notation for nested field
+                "rider.riderId": riderId, // Using dot notation for nested field
                 orderStatus: "confirmed"
             }).toArray();
             console.log(orders)

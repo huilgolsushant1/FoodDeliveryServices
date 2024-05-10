@@ -14,15 +14,15 @@ async function selectModeOfTransport(
   customerId
 ) {
   try {
+    console.log(data, orderedItems, customerName, customerId)
     let orderQuantity = orderedItems.length;
     let distance = data.distance / 1000;
     let modeOfTransport = "bike";
     let hasDelayInOrder = "no";
     let pathLenth = data.path.length;
     let sourceCoords = `${data.path[0][0]},${data.path[0][1]}`;
-    let destinationCoords = `${data.path[pathLenth - 1][0]},${
-      data.path[pathLenth - 1][1]
-    }`;
+    let destinationCoords = `${data.path[pathLenth - 1][0]},${data.path[pathLenth - 1][1]
+      }`;
 
     let weatherCondition = await getWeatherData(destinationCoords);
     let isDelicate = isOrderDelicate(orderedItems);
@@ -93,11 +93,14 @@ async function selectModeOfTransport(
       }
     }
     let newData = {
-      weatherCondition: weatherCondition,
-      modeOfTransport: modeOfTransport,
+      orderDetails:{
+      rider: {
+        modeOfTransport: modeOfTransport
+      },
+      weather: weatherCondition
+    }
     };
-
-    setOrder(key, newData);
+    await setOrder(key, newData);
     return newData;
   } catch (error) {
     console.log("Error to determine the mode of transport: ", error);
@@ -185,9 +188,8 @@ async function getTotalRouteTimeforMultipleRoutes(pathArrays, modeOfTransport) {
 
       for (let j = 0; j < coordinates.length - 1; j++) {
         const sourceCoords = `${coordinates[j][0]},${coordinates[j][1]}`;
-        const destinationCoords = `${coordinates[j + 1][0]},${
-          coordinates[j + 1][1]
-        }`;
+        const destinationCoords = `${coordinates[j + 1][0]},${coordinates[j + 1][1]
+          }`;
         const routeUrl = `https://api.tomtom.com/routing/1/calculateRoute/${sourceCoords}:${destinationCoords}/json?key=${apiKey}&traffic=true&computeTravelTimeFor=all&routeType=fastest&language=en&instructionsType=tagged&travelMode=${modeOfTransport}`;
         const routeResponse = await fetch(routeUrl);
         const trafficData = await routeResponse.json();
@@ -287,9 +289,10 @@ async function setOrder(code, newData) {
       modeOfTransport: newData.modeOfTransport,
       deliveryCharge: "",
     };
-    data.orderDetails.rider = rider;
-    await redisClient.set(String(code), JSON.stringify(data));
-    redisClient.quit();
+    data.orderDetails = {
+      rider: rider
+    }
+    redisClient.set(String(code), JSON.stringify(data));
     return "Order successfully set!";
   } catch (error) {
     console.error("Error setting order in Redis:", error);

@@ -14,13 +14,13 @@ const placeTheOrder = async (req, res) => {
     let reqObj = req.body;
 
     //allocate rider to order
+    
     let response = reqObj;
     response.orderDetails.rider = await getDriverLocation(
       reqObj.orderDetails.restaurantName,
       reqObj.orderDetails.rider.modeOfTransport
     );
     response.orderDetails.orderStatus = "confirmed";
-
     //add it to mongo db
     const db = mongoClient.db("FoodDeliveryService");
     const ordersCollection = db.collection("orders");
@@ -28,7 +28,7 @@ const placeTheOrder = async (req, res) => {
         const resultInsert = await ordersCollection.insertOne(reqObj.orderDetails);
         //update neo4j status
 
-        updateRiderStatus(response.orderDetails.rider.riderId.low, "assigned")
+        updateRiderStatus(response.orderDetails.rider.riderId, "assigned")
 
         if (resultInsert.insertedId) {
             response.orderDetails.orderId = resultInsert.insertedId.toString();
@@ -106,19 +106,20 @@ const checkPrice = async (req, res) => {
       (a, b) => a.travelTime - b.travelTime
     );
 
-    let modeOfTransport = await selectModeOfTransport(
+    console.log(shortestPaths)
+    let modeAndWeather = await selectModeOfTransport(
       shortestPaths[0][0],
       reqObj.orderedItems,
       reqObj.customerName,
       reqObj.customerId
     );
-    console.log(modeOfTransport); //calculateModeOfTransport(shortestPaths[0][0], reqObj.orderedItems)
+    console.log(modeAndWeather); 
 
     let deliveryCharge = 2300; //calculateTotalPrice(shortestPaths[0].distance, reqObj.customerName, reqObj.customerId, modeOfTransport)
-    reqObj.rider = {
-      modeOfTransport: modeOfTransport,
-      deliveryCharge: deliveryCharge,
-    };
+    // reqObj.rider = {
+    //   modeOfTransport: modeOfTransport,
+    //   deliveryCharge: deliveryCharge,
+    // };
     console.log(
       Buffer.from(
         reqObj.customerName.toLowerCase().trim().replace(" ", "") +
@@ -133,11 +134,15 @@ const checkPrice = async (req, res) => {
         ).toString("base64")
       )
     );
-    let response = {
-      shortestPaths: shortestPaths,
-      weather: "sunny",
-      orderDetails: reqObj,
-    };
+    
+
+      let response={
+        orderDetails:reqObj
+      }
+      response.orderDetails.rider=modeAndWeather.orderDetails.rider;
+      response.orderDetails.weather=modeAndWeather.orderDetails.weather;
+      response.shortestPaths= shortestPaths;
+      response.orderDetails.rider.deliveryCharge=deliveryCharge;
     res.status(200).json({
       success: true,
       message: "Price calculated",
