@@ -125,7 +125,7 @@ const checkPrice = async (req, res) => {
         ).toString("base64");
         
         console.log(modeAndWeather.orderDetails.weather)
-        const distance = 4500;//calculateModeOfTransport(shortestPaths[0], reqObj.orderedItems)
+        const distance = shortestPaths[0][0].distance;
         const weather = modeAndWeather.orderDetails.weather;
         const mode = modeAndWeather.orderDetails.rider.modeOfTransport;
     

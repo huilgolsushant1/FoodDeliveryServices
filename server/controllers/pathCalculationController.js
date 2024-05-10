@@ -30,7 +30,7 @@ const calculateShortestPath = async (restaurantName, deliveryAddress) => {
 
     session.close();
 
-    const totalTimePaths =  await getTotalRouteTimeforMultipleRoutes(shortestPaths, "motorcycle");
+    const totalTimePaths =  await getTotalRouteTimeforMultipleRoutes(shortestPaths, "car");
     return totalTimePaths;
     // shortestPaths[0].travelTime=20;
     // shortestPaths[1].travelTime=23;
