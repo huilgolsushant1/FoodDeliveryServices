@@ -80,37 +80,6 @@ export class CheckoutComponent {
     iconUrl: "https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png"
   });
 
-  calculateRouteAndPrice() {
-    if (this.selected && this.restaurant) {
-      this.ridersService.getRoute(this.restaurant, this.selected).subscribe((result: any) => {
-        if (result?.success && result?.data && result?.data) {
-          this.restaurantToDest = result?.data[0].path;
-          // L.Routing.control({
-          //   waypoints: this.restaurantToDest,
-          //   routeWhileDragging: true
-          // }).addTo(this.map);
-
-          var polyline = L.polyline(this.restaurantToDest)
-          .setStyle({ color: "red", weight: 7 })
-          .addTo(this.map);
-
-          var corner1 = L.latLng(this.restaurantToDest[0][0], this.restaurantToDest[0][1]),
-          corner2 = L.latLng(this.restaurantToDest[this.restaurantToDest.length-1][0], this.restaurantToDest[this.restaurantToDest.length-1][1])
-          
-           L.marker(corner1).addTo(this.map);
-           L.marker(corner2).addTo(this.map);
-
-          
-          let bounds = L.latLngBounds(corner1, corner2);
-          this.map.panInsideBounds(bounds)
-         // L.polyline(this.restaurantToDest, { color: 'blue' }).addTo(this.map);
-
-        }
-      })
-
-    }
-  }
-
   startRouting() {
     let startPoint = this.shortestPath.path[0];
     let endPoint = this.shortestPath.path[this.shortestPath.path.length - 1];    
@@ -119,12 +88,42 @@ export class CheckoutComponent {
           .setStyle({ color: "red", weight: 7 })
           .addTo(this.map);
 
+          const restaurant = L.icon({
+            iconUrl: 'assets/restaurant.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+
+          const customer = L.icon({
+            iconUrl: 'assets/customer.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+      
+          const bicycle = L.icon({
+            iconUrl: 'assets/bicycle.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+      
+          const bike = L.icon({
+            iconUrl: 'assets/bike.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+      
+          const car = L.icon({
+            iconUrl: 'assets/car.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          });
+
           var corner1 = L.latLng(startPoint[0], startPoint[1]),
           corner2 = L.latLng(endPoint[0], endPoint[1])
           
-           L.marker(corner1).addTo(this.map);
-           L.marker(corner2).addTo(this.map);
-           var marker = L.marker(corner1).addTo(this.map);
+           L.marker(corner1, { icon: restaurant }).addTo(this.map);
+           L.marker(corner2, { icon: customer }).addTo(this.map);
+           var marker = L.marker(corner1, { icon: bike }).addTo(this.map);
           
           let bounds = L.latLngBounds(corner1, corner2);
           this.map.panInsideBounds(bounds)

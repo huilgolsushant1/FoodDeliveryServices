@@ -89,7 +89,7 @@ const checkPrice = async (req, res) => {
         console.log(shortestPaths)
         shortestPaths = Array(shortestPaths).sort((a, b) => a.travelTime - b.travelTime);
         let modeOfTransport="car";//calculateModeOfTransport(shortestPaths[0], reqObj.orderedItems)
-        let deliveryCharge=2300; //calculateTotalPrice(shortestPaths[0].distance, reqObj.customerName, reqObj.customerId, modeOfTransport)
+        let deliveryCharge=Math.floor(10 + Math.random() * 30); //calculateTotalPrice(shortestPaths[0].distance, reqObj.customerName, reqObj.customerId, modeOfTransport)
         reqObj.rider={
             "modeOfTransport":modeOfTransport,
             "deliveryCharge":deliveryCharge
