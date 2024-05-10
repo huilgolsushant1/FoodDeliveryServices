@@ -74,10 +74,6 @@ export class RestaurantComponent {
         console.error('Error updating order status:', error);
       }
     );
-
-
-
-
   }
 
   formatOrderItems(orderItems: any[]): string {

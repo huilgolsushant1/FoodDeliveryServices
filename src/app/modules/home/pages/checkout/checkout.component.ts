@@ -3,6 +3,7 @@ import * as L from "leaflet";
 import { Icon, icon, Marker } from "leaflet";
 import 'leaflet-routing-machine';
 import { RidersService } from "../../../share/service/riders.service";
+import { HttpClient } from '@angular/common/http';
 
 const customMarker = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png",
@@ -29,12 +30,15 @@ export class CheckoutComponent {
   restaurant: string = "NUTRICION CELLULAR"
   restaurantToDest: any;
   shortestPath: any;
-  constructor(private ridersService: RidersService)
+  navigationStarted!: boolean;
+  constructor(private ridersService: RidersService, private http: HttpClient)
   {}
 
    ngOnInit() {
     const temp = history.state.res;
     this.orderDetails = temp.data.orderDetails;
+    console.log(this.orderDetails);
+    
     this.shortestPath = temp.data.shortestPaths[0][0];
     
     Marker.prototype.options.icon = this.defaultIcon;
@@ -138,7 +142,22 @@ export class CheckoutComponent {
 
   updateStatus()
   {
-
+    const customerObject = {
+      customerName: this.orderDetails.customerName,
+      customerId: this.orderDetails.customerId
+    }
+    this.http.post('http://localhost:3001/api/order/status/getStatus', customerObject).subscribe(
+      (res: any) => {
+        this.orderDetails = res.orderDetails;
+        if(this.orderDetails.orderStatus == 'Out For Delivery' && this.navigationStarted !== true ){
+          this.navigationStarted = true;
+          this.startRouting();
+        }
+      },
+      (error) => {
+        console.error('Error updating order status:', error);
+      }
+    );
   }
 
   }
