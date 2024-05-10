@@ -11,8 +11,8 @@ export class RestaurantComponent {
   buttonStates: boolean[][] = [];
   panelOpenState = false;
   restaurants: any;
-
-  constructor(private http: HttpClient) {}
+  readyForPickup:boolean=false;
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
     this.http
@@ -37,9 +37,46 @@ export class RestaurantComponent {
     });
   }
 
-  onPreparingFoodClicked(customerIndex: number, itemIndex: number) {
-    this.buttonStates[customerIndex][itemIndex] =
-      !this.buttonStates[customerIndex][itemIndex];
+  onPreparingFoodClicked(restaurantIndex: number, orderIndex: number, order: any) {
+    const statusBool = this.buttonStates[restaurantIndex][orderIndex];
+    if (statusBool) {
+      this.updateStatus(order, "Preparing Food")
+      
+      this.buttonStates[restaurantIndex][orderIndex] =
+        !this.buttonStates[restaurantIndex][orderIndex];
+      
+    }
+    else {
+      this.updateStatus(order, "Ready For Pickup")
+    }
+
+
+  }
+
+  updateStatus(order: any, status: string) {
+
+    let statusUpdateObj = {
+      "orderId": order.orderId,
+      "customerName": order.customerName,
+      "customerId": order.customerId,
+      "orderStatus": status,
+    }
+    this.http.post('http://localhost:3001/api/order/status/update', statusUpdateObj).subscribe(
+      (data) => {
+        console.log("Status updated " + status)
+        if(status==="Ready For Pickup")
+          {
+            this.readyForPickup=true;
+          }
+      },
+      (error) => {
+        console.error('Error updating order status:', error);
+      }
+    );
+
+
+
+
   }
 
   formatOrderItems(orderItems: any[]): string {

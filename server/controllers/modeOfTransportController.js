@@ -1,4 +1,6 @@
 const express = require("express");
+const axios = require("axios");
+
 const { distinct } = require("rxjs");
 const { redisClient } = require("../database");
 
@@ -15,15 +17,16 @@ async function selectModeOfTransport(
     let orderQuantity = orderedItems.length;
     let distance = data.distance / 1000;
     let modeOfTransport = "bike";
-    let hasDelayInOrder = flase;
+    let hasDelayInOrder = "no";
     let pathLenth = data.path.length;
     let sourceCoords = `${data.path[0][0]},${data.path[0][1]}`;
     let destinationCoords = `${data.path[pathLenth - 1][0]},${
       data.path[pathLenth - 1][1]
     }`;
 
-    let weatherCondition = getWeatherData(destinationCoords);
+    let weatherCondition = await getWeatherData(destinationCoords);
     let isDelicate = isOrderDelicate(orderedItems);
+
     let key = Buffer.from(
       customerName.toLowerCase().trim().replace(" ", "") + customerId
     ).toString("base64");
@@ -51,7 +54,7 @@ async function selectModeOfTransport(
 
     let routesData = [car, bike];
 
-    if (!hasDelayInOrder) {
+    if (hasDelayInOrder === "no") {
       if (
         (distance >= 6 && orderQuantity > 3 && checkRidersAvailibilty("car")) ||
         isDelicate
@@ -89,15 +92,13 @@ async function selectModeOfTransport(
         modeOfTransport = "car";
       }
     }
-
     let newData = {
       weatherCondition: weatherCondition,
       modeOfTransport: modeOfTransport,
     };
 
     setOrder(key, newData);
-
-    return modeOfTransport;
+    return newData;
   } catch (error) {
     console.log("Error to determine the mode of transport: ", error);
   }
@@ -255,8 +256,6 @@ async function getWeatherData(location) {
     } else {
       weatherCategory = "sunny";
     }
-
-    console.log(weatherCategory);
     return weatherCategory;
   } catch (error) {
     console.error("Error fetching weather data:", error);
@@ -298,16 +297,8 @@ async function setOrder(code, newData) {
   }
 }
 
-let customerName = "Dileep";
-let customerId = 5;
-let code = Buffer.from(
-  customerName.toLowerCase().trim().replace(" ", "") + customerId
-).toString("base64");
-
-let newData = {
-  weatherCondition: "rainy",
-  modeOfTransport: "bike",
+module.exports = {
+  getTotalRouteTimeforMultipleRoutes,
+  selectModeOfTransport,
+  setOrder,
 };
-
-//setOrder(code, newData);
-module.exports = { getTotalRouteTimeforMultipleRoutes, selectModeOfTransport };

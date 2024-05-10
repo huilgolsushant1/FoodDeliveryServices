@@ -36,11 +36,8 @@ const neo4jClient = neo4j.driver(process.env.NEO4J_URI, neo4j.auth.basic(process
 const redisClient = createClient({
 
     password: 'KzoQOukFIKHhlqcwCbymfUtIQxhtHvQx',
-
     socket: {
-
         host: 'redis-13493.c328.europe-west3-1.gce.redns.redis-cloud.com',
-
         port: 13493
 
     }
@@ -50,12 +47,11 @@ const redisClient = createClient({
 // Promisify client.get function
 const connectRedisDB= async()=>{
   redisClient.getAsync = promisify(redisClient.get).bind(redisClient);
-await redisClient.connect().then((r)=>{
-  console.log("redis connected")
-}) .catch((err) => {
-  console.log('err connecting to redis ' + err);
-});
-
+  await redisClient.connect().then((r)=>{
+    console.log("redis connected")
+  }).catch((err) => {
+    console.log('err connecting to redis ' + err);
+  });
 
 }
 
