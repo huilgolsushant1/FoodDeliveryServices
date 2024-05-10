@@ -242,4 +242,4 @@ const fetchOrderStatus = async (req, res) => {
     }
 }
 
-module.exports = { placeTheOrder, checkPrice, updateStatus }
+module.exports = { placeTheOrder, checkPrice, updateStatus, fetchOrderStatus}
